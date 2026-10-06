@@ -1,0 +1,72 @@
+---
+import { steps } from '../data/site';
+---
+
+<section class="section theme-olive process" id="proceso">
+  <div class="wrap">
+    <span class="kicker reveal">No hace falta saber de marketing</span>
+    <h2 class="display title" data-reveal>
+      <span class="line-mask"><span>¿No sabés qué</span></span>
+      <span class="line-mask"><span style="--d: 0.08s">hacer con tu marca?</span></span>
+    </h2>
+    <p class="lead reveal">
+      No necesitás llegar sabiendo si lo que buscás se llama branding, pauta, social media, una landing o una
+      estrategia. <strong>Contame qué querés mejorar, qué querés lograr o qué problema querés resolver.</strong>
+    </p>
+
+    <ol class="steps">
+      {
+        steps.map((s, i) => (
+          <li class="reveal" style={`--d: ${i * 0.08}s`}>
+            <span class="step-num">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .title {
+    margin: 0.9rem 0 2rem;
+  }
+  .lead {
+    max-width: 52ch;
+  }
+  .steps {
+    display: grid;
+    gap: 2rem;
+    margin: clamp(3rem, 8vw, 6rem) 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+  li {
+    position: relative;
+    display: grid;
+    gap: 0.4rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(13, 13, 13, 0.3);
+  }
+  .step-num {
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+  }
+  p {
+    color: rgba(13, 13, 13, 0.65);
+  }
+  @media (min-width: 900px) {
+    .steps {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

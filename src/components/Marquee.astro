@@ -1,0 +1,64 @@
+---
+import { clients } from '../data/site';
+---
+
+<div class="marquee theme-dark" aria-label="Marcas con las que trabajamos">
+  {
+    [0, 1].map((copy) => (
+      <ul class="track" aria-hidden={copy === 1 ? 'true' : undefined}>
+        {clients.map((name) => (
+          <li>
+            {name}
+            <img src="/brand/isotipo-white.png" alt="" width="200" height="240" />
+          </li>
+        ))}
+      </ul>
+    ))
+  }
+</div>
+
+<style>
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    padding-block: 1.4rem;
+    border-block: 1px solid var(--line-dark);
+  }
+  .track {
+    display: flex;
+    flex-shrink: 0;
+    gap: 2.5rem;
+    padding: 0 1.25rem;
+    margin: 0;
+    list-style: none;
+    animation: scroll 45s linear infinite;
+  }
+  .marquee:hover .track {
+    animation-play-state: paused;
+  }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+  }
+  img {
+    height: 1.1em;
+    width: auto;
+    opacity: 0.55;
+  }
+  @keyframes scroll {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .track {
+      animation: none;
+    }
+  }
+</style>

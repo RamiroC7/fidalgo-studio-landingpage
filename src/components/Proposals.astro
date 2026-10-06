@@ -1,0 +1,92 @@
+---
+import { proposals, contact } from '../data/site';
+---
+
+<section class="section proposals">
+  <div class="wrap">
+    <span class="kicker reveal">Cada proyecto es distinto</span>
+    <h2 class="display title" data-reveal>
+      <span class="line-mask"><span>Propuestas</span></span>
+      <span class="line-mask"><span style="--d: 0.08s">personalizadas.</span></span>
+    </h2>
+    <p class="lead reveal">
+      Las propuestas se arman según los objetivos, el tipo de contenido, la frecuencia, el alcance y las áreas que
+      necesite cada marca.
+    </p>
+
+    <ul class="cards">
+      {
+        proposals.map((p, i) => (
+          <li class="reveal" style={`--d: ${i * 0.08}s`}>
+            <span class="num">Formato {String(i + 1).padStart(2, '0')}</span>
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+            <a href={contact.whatsappUrl(`Hola Tomás! Me interesa un ${p.title.toLowerCase()}.`)} target="_blank" rel="noopener">
+              Consultar <span aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="note reveal">
+      La propuesta final se define después de entender el proyecto. La idea es resolver lo que necesitás, no encajarte
+      en un paquete genérico.
+    </p>
+  </div>
+</section>
+
+<style>
+  .title {
+    margin: 0.9rem 0 2rem;
+  }
+  .lead {
+    max-width: 50ch;
+  }
+  .cards {
+    display: grid;
+    gap: 1.25rem;
+    margin: clamp(3rem, 6vw, 4.5rem) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1.75rem;
+    border: 1px solid var(--line-light);
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    line-height: 1.02;
+  }
+  li p {
+    color: #444;
+  }
+  li a {
+    margin-top: auto;
+    padding-top: 1.2rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  li a:hover {
+    color: var(--olive);
+  }
+  .note {
+    margin-top: 2.5rem;
+    max-width: 70ch;
+    font-size: 0.92rem;
+    color: var(--gray);
+  }
+  @media (min-width: 900px) {
+    .cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

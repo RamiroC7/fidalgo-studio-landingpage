@@ -1,0 +1,124 @@
+---
+import { contact } from '../data/site';
+const year = new Date().getFullYear();
+---
+
+<section class="section theme-dark contact" id="contacto">
+  <div class="wrap grid">
+    <div>
+      <span class="kicker reveal">¿Tenés un proyecto?</span>
+      <h2 class="display title" data-reveal>
+        <span class="line-mask"><span>Comencemos</span></span>
+        <span class="line-mask olive"><span style="--d: 0.08s">juntos.</span></span>
+      </h2>
+      <p class="lead reveal">
+        Contame qué querés hacer, qué querés mejorar o qué problema necesitás resolver. A partir de ahí vemos qué tiene
+        sentido construir.
+      </p>
+    </div>
+
+    <dl class="channels reveal" style="--d: 0.15s">
+      <div>
+        <dt>WhatsApp</dt>
+        <dd><a href={contact.whatsappUrl()} target="_blank" rel="noopener">{contact.whatsappDisplay}</a></dd>
+      </div>
+      <div>
+        <dt>Mail</dt>
+        <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
+      </div>
+      <div>
+        <dt>Instagram</dt>
+        <dd><a href={contact.instagramUrl} target="_blank" rel="noopener">{contact.instagram}</a></dd>
+      </div>
+      <a class="btn" href={contact.whatsappUrl()} target="_blank" rel="noopener">Contame tu proyecto <span class="arrow">→</span></a>
+    </dl>
+  </div>
+
+  <footer class="footer wrap">
+    <img class="big-logo" src="/brand/logo-white.png" alt="Fidalgo Studio" width="1000" height="381" loading="lazy" />
+    <div class="legal">
+      <span>Tomás Fidalgo · Dirección creativa</span>
+      <span>Fidalgo Studio / {year}</span>
+    </div>
+  </footer>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    gap: 3rem 6rem;
+    align-items: end;
+  }
+  .title {
+    margin: 0.9rem 0 2rem;
+    font-size: clamp(2.6rem, 10.5vw, 7.4rem);
+  }
+  .lead {
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .channels {
+    display: grid;
+    gap: 1.4rem;
+    margin: 0;
+    padding-left: 0;
+  }
+  .channels > div {
+    display: grid;
+    gap: 0.2rem;
+  }
+  dt {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--olive);
+  }
+  dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 1.7vw, 1.6rem);
+    overflow-wrap: anywhere;
+  }
+  dd a:hover {
+    color: var(--olive);
+  }
+  .channels .btn {
+    justify-self: start;
+    margin-top: 0.8rem;
+  }
+  @media (min-width: 960px) {
+    .grid {
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    }
+    .title {
+      font-size: clamp(3rem, 6.4vw, 7.4rem);
+    }
+    .channels {
+      padding-left: 3rem;
+      border-left: 1px solid var(--line-dark);
+    }
+  }
+
+  .footer {
+    margin-top: clamp(5rem, 12vw, 9rem);
+  }
+  .big-logo {
+    width: 100%;
+    height: auto;
+    opacity: 0.95;
+  }
+  .legal {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 2rem;
+    margin-top: 2rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--line-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+</style>

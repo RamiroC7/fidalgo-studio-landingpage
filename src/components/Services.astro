@@ -1,0 +1,97 @@
+---
+import { services } from '../data/site';
+---
+
+<section class="section services" id="servicios">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker reveal">Trabajo directo</span>
+        <h2 class="display" data-reveal>
+          <span class="line-mask"><span>Qué</span></span>
+          <span class="line-mask"><span style="--d: 0.08s">hago.</span></span>
+        </h2>
+      </div>
+      <p class="reveal">Servicios desarrollados desde Fidalgo Studio para marcas, proyectos y emprendimientos.</p>
+    </div>
+
+    <ul class="cards">
+      {
+        services.map((s, i) => (
+          <li class="card reveal" style={`--d: ${(i % 3) * 0.08}s`}>
+            <span class="num">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+            <small>{s.tags}</small>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  .card {
+    grid-column: span 6;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    min-height: 15rem;
+    padding: 1.75rem;
+    border: 1px solid var(--line-light);
+    transition: background 0.5s var(--ease), color 0.5s var(--ease), border-color 0.5s;
+  }
+  .card:hover {
+    background: var(--ink);
+    color: var(--white);
+    border-color: var(--ink);
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(1.3rem, 2vw, 1.75rem);
+    line-height: 1.02;
+    max-width: 14ch;
+  }
+  p {
+    color: #444;
+    transition: color 0.5s;
+  }
+  .card:hover p {
+    color: rgba(255, 255, 255, 0.75);
+  }
+  small {
+    margin-top: auto;
+    padding-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+  .card:hover small {
+    color: var(--olive);
+  }
+  @media (min-width: 700px) {
+    .card {
+      grid-column: span 3;
+    }
+  }
+  @media (min-width: 1000px) {
+    .card {
+      grid-column: span 2;
+    }
+    .card:nth-child(n + 4) {
+      grid-column: span 3;
+    }
+    .card:nth-child(n + 4) h3 {
+      max-width: none;
+    }
+  }
+</style>

@@ -1,0 +1,101 @@
+---
+import { collabs } from '../data/site';
+---
+
+<section class="section theme-dark collabs">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="pill reveal">En colaboración con especialistas</span>
+        <h2 class="display display--md" data-reveal>
+          <span class="line-mask"><span>Más áreas.</span></span>
+          <span class="line-mask"><span style="--d: 0.08s">Un mismo punto</span></span>
+          <span class="line-mask"><span style="--d: 0.16s">de contacto.</span></span>
+        </h2>
+      </div>
+      <p class="reveal">
+        Además de mi trabajo directo en contenido y producción audiovisual, colaboro con profesionales especializados
+        para resolver otras necesidades del proyecto.
+      </p>
+    </div>
+
+    <ul class="cards">
+      {
+        collabs.map((c, i) => (
+          <li class="reveal" style={`--d: ${i * 0.08}s`}>
+            <span class="kicker">{c.area}</span>
+            <h3>{c.title}</h3>
+            <p>{c.text}</p>
+            {c.tags && <small>{c.tags}</small>}
+          </li>
+        ))
+      }
+    </ul>
+    <p class="note reveal">
+      Todos los proyectos se coordinan a través de Fidalgo Studio. Vos tenés un mismo punto de contacto y armamos el
+      equipo según lo que realmente necesite tu proyecto.
+    </p>
+  </div>
+</section>
+
+<style>
+  .pill {
+    display: inline-block;
+    margin-bottom: 1.1rem;
+    padding: 0.55em 1.1em;
+    border-radius: 999px;
+    background: var(--olive);
+    color: var(--ink);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .section-head p {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .cards {
+    display: grid;
+    gap: 1.25rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1.75rem;
+    background: var(--ink-2);
+    border: 1px solid var(--line-dark);
+    transition: border-color 0.4s;
+  }
+  li:hover {
+    border-color: var(--olive);
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(1.35rem, 2vw, 1.75rem);
+    line-height: 1.02;
+  }
+  li p {
+    color: rgba(255, 255, 255, 0.72);
+  }
+  small {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+  }
+  .note {
+    margin-top: 2.5rem;
+    max-width: 70ch;
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  @media (min-width: 900px) {
+    .cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

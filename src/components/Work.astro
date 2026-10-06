@@ -1,0 +1,438 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image, getImage } from 'astro:assets';
+import { projects } from '../data/site';
+
+// Fotos generadas por `npm run media` en src/assets/work/<slug>/NN.jpg
+const files = import.meta.glob<{ default: ImageMetadata }>('/src/assets/work/*/*.jpg', { eager: true });
+const photosOf = (slug: string) =>
+  Object.entries(files)
+    .filter(([path]) => path.includes(`/work/${slug}/`))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, mod]) => mod.default);
+
+const items = await Promise.all(
+  projects
+    .map((p) => ({ ...p, photos: photosOf(p.slug) }))
+    .filter((p) => p.photos.length)
+    .map(async (p, i) => ({
+      ...p,
+      num: String(i + 1).padStart(2, '0'),
+      preview: (await getImage({ src: p.photos[0], width: 560, format: 'webp' })).src,
+    })),
+);
+---
+
+<section class="section work" id="trabajos">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker reveal">Trabajos seleccionados</span>
+        <h2 class="display" data-reveal>
+          <span class="line-mask"><span>Portfolio.</span></span>
+        </h2>
+      </div>
+      <div class="head-side reveal">
+        <p>Producciones de foto y video para marcas de gastronomía, moda, retail, eventos y más.</p>
+        <div class="toggle" role="group" aria-label="Vista del portfolio">
+          <button data-view="list" aria-pressed="true">Lista</button>
+          <button data-view="grid" aria-pressed="false">Grilla</button>
+        </div>
+      </div>
+    </div>
+
+    <ol class="projects" data-view="list">
+      {
+        items.map((p) => (
+          <li class="project reveal">
+            <button class="row" data-open={p.slug} data-preview={p.preview}>
+              <span class="cover">
+                <Image src={p.photos[0]} alt="" widths={[480, 800]} sizes="(min-width: 900px) 33vw, 100vw" />
+              </span>
+              <span class="num">{p.num}</span>
+              <span class="client">{p.client}</span>
+              <span class="meta">{p.category}</span>
+              <span class="meta services">{p.services}</span>
+              <span class="year">{p.year}</span>
+              <span class="go" aria-hidden="true">
+                ↗
+              </span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <div class="cursor-preview" aria-hidden="true"><img alt="" /></div>
+
+  {
+    items.map((p) => (
+      <dialog class="gallery theme-dark" id={`g-${p.slug}`} aria-label={`Fotos de ${p.client}`}>
+        <header class="g-head wrap">
+          <div>
+            <span class="num">{p.num}</span>
+            <h3>{p.client}</h3>
+            <p>
+              {p.category} · {p.services} · {p.year}
+            </p>
+          </div>
+          <form method="dialog">
+            <button class="g-close">Cerrar ✕</button>
+          </form>
+        </header>
+        <div class="g-track" data-lenis-prevent>
+          {p.photos.map((photo, i) => (
+            <Image
+              src={photo}
+              alt={`${p.client} — foto ${i + 1}`}
+              widths={[640, 1080, 1600]}
+              sizes="(min-width: 900px) 50vw, 90vw"
+              loading="lazy"
+            />
+          ))}
+        </div>
+        <p class="g-hint wrap">Deslizá para ver más →</p>
+      </dialog>
+    ))
+  }
+</section>
+
+<style>
+  .head-side {
+    display: grid;
+    gap: 1.2rem;
+    justify-items: start;
+  }
+  @media (min-width: 900px) {
+    .head-side {
+      justify-items: end;
+      text-align: right;
+    }
+  }
+  .toggle {
+    display: inline-flex;
+    padding: 4px;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+  }
+  .toggle button {
+    padding: 0.5em 1.1em;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: background 0.3s, color 0.3s;
+  }
+  .toggle button[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .projects {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .row {
+    width: 100%;
+    text-align: left;
+  }
+  .cover {
+    display: block;
+    overflow: hidden;
+    background: var(--paper);
+  }
+  .cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1s var(--ease);
+  }
+
+  /* ----- Vista lista ----- */
+  [data-view='list'] .project {
+    border-top: 1px solid var(--line-light);
+  }
+  [data-view='list'] .project:last-child {
+    border-bottom: 1px solid var(--line-light);
+  }
+  [data-view='list'] .row {
+    display: grid;
+    grid-template-columns: 3rem 1fr auto;
+    align-items: center;
+    gap: 0.3rem 1.5rem;
+    padding: 1.6rem 0;
+    transition: padding 0.5s var(--ease), color 0.3s;
+  }
+  [data-view='list'] .cover {
+    display: none;
+  }
+  [data-view='list'] .client {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(1.4rem, 3.4vw, 2.8rem);
+    line-height: 1;
+  }
+  [data-view='list'] .meta {
+    grid-column: 2;
+    color: var(--gray);
+    font-size: 0.9rem;
+  }
+  [data-view='list'] .services,
+  [data-view='list'] .year {
+    display: none;
+  }
+  [data-view='list'] .go {
+    grid-row: 1;
+    grid-column: 3;
+    font-size: 1.6rem;
+    transition: transform 0.5s var(--ease);
+  }
+  @media (min-width: 900px) {
+    [data-view='list'] .row {
+      grid-template-columns: 4rem 1.6fr 1fr 1fr 4rem 2rem;
+    }
+    [data-view='list'] .meta {
+      grid-column: auto;
+    }
+    [data-view='list'] .services,
+    [data-view='list'] .year {
+      display: block;
+    }
+    [data-view='list'] .go {
+      grid-row: auto;
+      grid-column: auto;
+    }
+    [data-view='list'] .row:hover {
+      padding-left: 1rem;
+    }
+    [data-view='list'] .row:hover .client {
+      color: var(--olive);
+    }
+    [data-view='list'] .row:hover .go {
+      transform: rotate(45deg);
+    }
+  }
+
+  /* ----- Vista grilla ----- */
+  [data-view='grid'] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 3rem 1.5rem;
+  }
+  [data-view='grid'] .row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.3rem 0.8rem;
+    align-items: baseline;
+  }
+  [data-view='grid'] .cover {
+    grid-column: 1 / -1;
+    aspect-ratio: 4 / 5;
+    margin-bottom: 0.9rem;
+  }
+  [data-view='grid'] .row:hover .cover img {
+    transform: scale(1.05);
+  }
+  [data-view='grid'] .client {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1.25rem;
+  }
+  [data-view='grid'] .meta {
+    grid-column: 2 / -1;
+    color: var(--gray);
+    font-size: 0.88rem;
+  }
+  [data-view='grid'] .services,
+  [data-view='grid'] .go {
+    display: none;
+  }
+
+  /* Foto que sigue al cursor en la vista lista */
+  .cursor-preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 40;
+    width: 280px;
+    aspect-ratio: 4 / 5;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    scale: 0.85;
+    transition: opacity 0.35s var(--ease), scale 0.5s var(--ease);
+  }
+  .cursor-preview.on {
+    opacity: 1;
+    scale: 1;
+  }
+  .cursor-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ----- Galería ----- */
+  .gallery {
+    width: 100vw;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    flex-direction: column;
+  }
+  .gallery[open] {
+    display: flex;
+    animation: fade 0.45s var(--ease);
+  }
+  .gallery::backdrop {
+    background: var(--ink);
+  }
+  .g-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-block: 1.5rem;
+  }
+  .g-head h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    line-height: 1;
+    margin-top: 0.3rem;
+  }
+  .g-head p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  .g-close {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.7em 1.2em;
+    border: 1px solid var(--line-dark);
+    border-radius: 999px;
+  }
+  .g-track {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 0 var(--gutter);
+    scrollbar-width: thin;
+    scrollbar-color: var(--olive) transparent;
+  }
+  .g-track img {
+    height: 100%;
+    width: auto;
+    max-width: 88vw;
+    object-fit: contain;
+    scroll-snap-align: center;
+    flex-shrink: 0;
+  }
+  .g-hint {
+    padding-block: 1rem 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  const list = document.querySelector<HTMLOListElement>('.projects')!;
+  const toggles = document.querySelectorAll<HTMLButtonElement>('.toggle button');
+  const preview = document.querySelector<HTMLDivElement>('.cursor-preview')!;
+  const previewImg = preview.querySelector('img')!;
+
+  // Cambio de vista lista / grilla (se recuerda en el navegador)
+  const setView = (view: string) => {
+    list.dataset.view = view;
+    toggles.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
+    try {
+      localStorage.setItem('fs-view', view);
+    } catch {}
+  };
+  toggles.forEach((b) => b.addEventListener('click', () => setView(b.dataset.view!)));
+  try {
+    const saved = localStorage.getItem('fs-view');
+    if (saved === 'grid' || saved === 'list') setView(saved);
+  } catch {}
+
+  // Foto que sigue al cursor (solo con mouse y en vista lista)
+  const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (canHover) {
+    let x = 0,
+      y = 0,
+      cx = 0,
+      cy = 0,
+      raf = 0;
+    const loop = () => {
+      cx += (x - cx) * 0.18;
+      cy += (y - cy) * 0.18;
+      preview.style.transform = `translate(${cx + 24}px, ${cy - 160}px)`;
+      raf = requestAnimationFrame(loop);
+    };
+    list.querySelectorAll<HTMLButtonElement>('.row').forEach((row) => {
+      row.addEventListener('mouseenter', (e) => {
+        if (list.dataset.view !== 'list') return;
+        previewImg.src = row.dataset.preview!;
+        x = cx = e.clientX;
+        y = cy = e.clientY;
+        preview.classList.add('on');
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(loop);
+      });
+      row.addEventListener('mousemove', (e) => {
+        x = e.clientX;
+        y = e.clientY;
+      });
+      row.addEventListener('mouseleave', () => {
+        preview.classList.remove('on');
+        cancelAnimationFrame(raf);
+      });
+    });
+  }
+
+  // Galería por proyecto
+  document.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const dialog = document.getElementById(`g-${btn.dataset.open}`) as HTMLDialogElement;
+      preview.classList.remove('on');
+      dialog.showModal();
+      document.dispatchEvent(new Event('lenis:stop'));
+      dialog.addEventListener('close', () => document.dispatchEvent(new Event('lenis:start')), { once: true });
+    });
+  });
+  // Rueda del mouse vertical → scroll horizontal en la galería
+  document.querySelectorAll<HTMLDivElement>('.g-track').forEach((track) => {
+    track.addEventListener(
+      'wheel',
+      (e) => {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          track.scrollLeft += e.deltaY;
+          e.preventDefault();
+        }
+      },
+      { passive: false },
+    );
+  });
+</script>

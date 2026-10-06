@@ -1,0 +1,61 @@
+---
+import { skills } from '../data/site';
+---
+
+<section class="section theme-paper skills">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker reveal">Cómo trabajo</span>
+        <h2 class="display display--md" data-reveal>
+          <span class="line-mask"><span>Habilidades</span></span>
+          <span class="line-mask"><span style="--d: 0.08s">que combinan.</span></span>
+        </h2>
+      </div>
+    </div>
+    <ol class="list">
+      {
+        skills.map((s, i) => (
+          <li class="reveal" style={`--d: ${(i % 2) * 0.08}s`}>
+            <span class="num">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .list {
+    display: grid;
+    gap: 0 4rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  li {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.6rem 0 2.2rem;
+    border-top: 1px solid var(--line-light);
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+    line-height: 1.02;
+  }
+  p {
+    color: #555;
+    max-width: 52ch;
+  }
+  @media (min-width: 900px) {
+    .list {
+      grid-template-columns: 1fr 1fr;
+      grid-auto-flow: column;
+      grid-template-rows: auto auto;
+    }
+  }
+</style>

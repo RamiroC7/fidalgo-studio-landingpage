@@ -1,0 +1,220 @@
+---
+import { nav, contact } from '../data/site';
+---
+
+<header class="header">
+  <div class="bar wrap">
+    <a href="#top" class="logo" aria-label="Fidalgo Studio, volver arriba">
+      <img src="/brand/logo-black.png" alt="Fidalgo Studio" width="1000" height="381" />
+    </a>
+    <nav class="links" aria-label="Principal">
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+    </nav>
+    <a class="cta" href={contact.whatsappUrl()} target="_blank" rel="noopener">Contame tu proyecto <span aria-hidden="true">→</span></a>
+    <button class="menu-btn" aria-expanded="false" aria-controls="menu" data-menu-open>
+      <span class="sr-only">Abrir menú</span>
+      <span class="burger" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+
+<div class="menu theme-dark" id="menu" hidden>
+  <div class="menu-top wrap">
+    <img src="/brand/logo-white.png" alt="" width="1000" height="381" class="menu-logo" />
+    <button class="menu-close" data-menu-close>Cerrar</button>
+  </div>
+  <nav class="menu-links wrap" aria-label="Menú">
+    {
+      nav.map((item, i) => (
+        <a href={item.href} data-menu-close>
+          <span class="num">0{i + 1}</span>
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+  <div class="menu-foot wrap">
+    <a class="btn" href={contact.whatsappUrl()} target="_blank" rel="noopener">WhatsApp <span class="arrow">→</span></a>
+    <a href={contact.instagramUrl} target="_blank" rel="noopener">{contact.instagram}</a>
+  </div>
+</div>
+
+<style>
+  /* Transparente arriba de todo; al scrollear toma un fondo claro translúcido */
+  .header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    color: var(--ink);
+    pointer-events: none;
+    transition: background 0.4s, backdrop-filter 0.4s, translate 0.5s var(--ease);
+  }
+  .header.scrolled {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    pointer-events: auto;
+  }
+  .header.hide {
+    translate: 0 -100%;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: 4.5rem;
+  }
+  .bar > * {
+    pointer-events: auto;
+  }
+  .logo img {
+    height: 2.1rem;
+    width: auto;
+  }
+  .links {
+    display: none;
+    gap: 2rem;
+    margin-left: auto;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .links a,
+  .cta {
+    position: relative;
+  }
+  .links a::after,
+  .cta::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.5s var(--ease);
+  }
+  .links a:hover::after,
+  .cta:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .cta {
+    display: none;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .menu-btn {
+    margin-left: auto;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: grid;
+    place-items: center;
+  }
+  .burger,
+  .burger::before {
+    display: block;
+    width: 1.6rem;
+    height: 2px;
+    background: currentColor;
+  }
+  .burger {
+    position: relative;
+    transform: translateY(-4px);
+  }
+  .burger::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+  }
+  @media (min-width: 960px) {
+    .links,
+    .cta {
+      display: flex;
+    }
+    .menu-btn {
+      display: none;
+    }
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-block: 0 2rem;
+  }
+  .menu[hidden] {
+    display: none;
+  }
+  .menu-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4.5rem;
+  }
+  .menu-logo {
+    height: 2.1rem;
+    width: auto;
+  }
+  .menu-close {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .menu-links {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .menu-links a {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(2.4rem, 11vw, 4rem);
+    line-height: 1.05;
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+  }
+  .menu-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+</style>
+
+<script>
+  const menu = document.getElementById('menu')!;
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]')!;
+  const setOpen = (open: boolean) => {
+    menu.hidden = !open;
+    openBtn.setAttribute('aria-expanded', String(open));
+    document.body.style.overflow = open ? 'hidden' : '';
+    document.dispatchEvent(new Event(open ? 'lenis:stop' : 'lenis:start'));
+  };
+  openBtn.addEventListener('click', () => setOpen(true));
+  menu.querySelectorAll('[data-menu-close]').forEach((el) => el.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => e.key === 'Escape' && !menu.hidden && setOpen(false));
+
+  // Fondo al scrollear y se esconde al bajar (reaparece al subir)
+  const header = document.querySelector<HTMLElement>('.header')!;
+  let lastY = window.scrollY;
+  const onScroll = () => {
+    const y = window.scrollY;
+    header.classList.toggle('scrolled', y > 40);
+    header.classList.toggle('hide', y > 400 && y > lastY);
+    lastY = y;
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>

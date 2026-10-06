@@ -1,0 +1,102 @@
+<section class="section theme-dark manifesto">
+  <div class="wrap">
+    <span class="kicker reveal">Estética + estrategia</span>
+    <p class="statement reveal">
+      Transformamos ideas en piezas visuales con identidad, pensadas no solo para verse bien, sino para{' '}
+      <strong>comunicar, conectar y cumplir un objetivo.</strong>
+    </p>
+  </div>
+
+  <figure class="showreel reveal">
+    <video
+      src="/media/showreel.mp4"
+      poster="/media/showreel.webp"
+      muted
+      loop
+      playsinline
+      preload="none"
+      data-autoplay
+      aria-label="Fragmento del video institucional de Baum"></video>
+    <figcaption>Baum — video institucional</figcaption>
+  </figure>
+
+  <div class="wrap bottom">
+    <p class="reveal">
+      Cada proyecto se aborda de manera personalizada, buscando entender la esencia de cada marca, su universo y lo que
+      quiere transmitir. La propuesta combina creatividad, criterio visual y estrategia en todas las etapas del proceso.
+    </p>
+    <p class="quote reveal" style="--d: 0.1s">
+      <strong>No se trata solamente de crear contenido.</strong>
+      <span>Se trata de construir una identidad visual que tenga algo para decir.</span>
+    </p>
+    <img class="mark" src="/brand/isotipo-white.png" alt="" width="205" height="240" />
+  </div>
+</section>
+
+<style>
+  .statement {
+    margin-top: 1rem;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 4.4vw, 4rem);
+    line-height: 1.08;
+    max-width: 22ch;
+  }
+  .statement strong {
+    font-weight: 800;
+  }
+  .showreel {
+    position: relative;
+    margin: clamp(3.5rem, 8vw, 6rem) 0;
+    aspect-ratio: 16 / 7;
+    overflow: hidden;
+  }
+  .showreel video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  figcaption {
+    position: absolute;
+    left: var(--gutter);
+    bottom: 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+  .bottom {
+    position: relative;
+    display: grid;
+    gap: 2.5rem 5rem;
+    color: rgba(255, 255, 255, 0.82);
+  }
+  .quote {
+    display: grid;
+    gap: 0.4rem;
+    font-size: clamp(1.15rem, 1.7vw, 1.4rem);
+    line-height: 1.4;
+    padding-left: 2rem;
+    border-left: 1px solid var(--line-dark);
+  }
+  .quote strong {
+    color: var(--white);
+  }
+  .quote span {
+    color: var(--olive);
+  }
+  .mark {
+    position: absolute;
+    right: var(--gutter);
+    bottom: -2rem;
+    width: auto;
+    height: 9rem;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+  @media (min-width: 900px) {
+    .bottom {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

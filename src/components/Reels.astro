@@ -1,0 +1,262 @@
+---
+import { reels, contact } from '../data/site';
+---
+
+<section class="section theme-dark reels" id="reels">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="kicker reveal">Video + edición</span>
+        <h2 class="display" data-reveal>
+          <span class="line-mask"><span>Reels.</span></span>
+        </h2>
+      </div>
+      <div class="reveal">
+        <p>Ideas, guion, rodaje y edición pensados para cada plataforma. Tocá un reel para verlo con sonido.</p>
+        <div class="arrows">
+          <button data-scroll="-1" aria-label="Reels anteriores">←</button>
+          <button data-scroll="1" aria-label="Reels siguientes">→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="strip" data-lenis-prevent-wheel>
+    {
+      reels.map((r, i) => (
+        <li class="reveal" style={`--d: ${Math.min(i, 4) * 0.06}s`}>
+          <button class="card" data-reel={r.slug} aria-label={`Ver reel de ${r.client}`}>
+            <video
+              src={`/media/reels/${r.slug}-preview.mp4`}
+              poster={`/media/reels/${r.slug}.webp`}
+              muted
+              loop
+              playsinline
+              preload="none"
+              data-autoplay
+            />
+            <span class="play" aria-hidden="true">
+              ▶
+            </span>
+            <span class="info">
+              <span class="num">{String(i + 1).padStart(2, '0')}</span>
+              <strong>{r.client}</strong>
+              <span>{r.tag}</span>
+            </span>
+          </button>
+        </li>
+      ))
+    }
+    <li class="more">
+      <a href={contact.instagramUrl} target="_blank" rel="noopener">
+        <span>Más en Instagram</span>
+        <strong>{contact.instagram}</strong>
+        <span class="arrow" aria-hidden="true">
+          ↗
+        </span>
+      </a>
+    </li>
+  </ul>
+
+  <dialog class="player" aria-label="Reproductor de reel">
+    <form method="dialog"><button class="p-close">Cerrar ✕</button></form>
+    <video controls playsinline></video>
+  </dialog>
+</section>
+
+<style>
+  .reels p {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .arrows {
+    display: none;
+    gap: 0.5rem;
+    margin-top: 1.4rem;
+    justify-content: flex-end;
+  }
+  .arrows button {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-dark);
+    font-size: 1.1rem;
+    transition: background 0.3s, color 0.3s;
+  }
+  .arrows button:hover {
+    background: var(--olive);
+    color: var(--ink);
+    border-color: var(--olive);
+  }
+  @media (min-width: 900px) {
+    .arrows {
+      display: flex;
+    }
+  }
+
+  .strip {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    padding: 0 var(--gutter) 1.5rem;
+    margin: 0;
+    list-style: none;
+    scrollbar-width: thin;
+    scrollbar-color: var(--olive) transparent;
+  }
+  .strip > li {
+    flex: 0 0 clamp(220px, 22vw, 300px);
+    scroll-snap-align: start;
+  }
+  .card {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    border-radius: 1rem;
+    overflow: hidden;
+    background: var(--ink-2);
+    text-align: left;
+  }
+  .card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.9s var(--ease);
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13, 13, 13, 0.85), transparent 45%);
+  }
+  .card:hover video {
+    transform: scale(1.04);
+  }
+  .play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 3.6rem;
+    height: 3.6rem;
+    margin: -1.8rem 0 0 -1.8rem;
+    padding-left: 0.2rem;
+    border-radius: 50%;
+    background: var(--olive);
+    color: var(--ink);
+    opacity: 0;
+    scale: 0.7;
+    transition: opacity 0.4s var(--ease), scale 0.4s var(--ease);
+  }
+  .card:hover .play,
+  .card:focus-visible .play {
+    opacity: 1;
+    scale: 1;
+  }
+  .info {
+    position: absolute;
+    inset: auto 1rem 1rem;
+    z-index: 1;
+    display: grid;
+    gap: 0.15rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .info strong {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1.05rem;
+    line-height: 1.1;
+    color: var(--white);
+  }
+  .more a {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.3rem;
+    height: 100%;
+    aspect-ratio: 9 / 16;
+    padding: 1.4rem;
+    border-radius: 1rem;
+    background: var(--olive);
+    color: var(--ink);
+  }
+  .more strong {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 800;
+  }
+  .more .arrow {
+    font-size: 2rem;
+    transition: transform 0.5s var(--ease);
+  }
+  .more a:hover .arrow {
+    transform: translate(4px, -4px);
+  }
+
+  .player {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+  }
+  .player[open] {
+    display: grid;
+    gap: 0.8rem;
+    justify-items: end;
+  }
+  .player::backdrop {
+    background: rgba(13, 13, 13, 0.92);
+    backdrop-filter: blur(6px);
+  }
+  .player video {
+    height: min(82dvh, 160vw);
+    width: auto;
+    aspect-ratio: 9 / 16;
+    border-radius: 1rem;
+    background: #000;
+  }
+  .p-close {
+    color: var(--white);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+</style>
+
+<script>
+  const strip = document.querySelector<HTMLUListElement>('.strip')!;
+  document.querySelectorAll<HTMLButtonElement>('[data-scroll]').forEach((b) =>
+    b.addEventListener('click', () => {
+      strip.scrollBy({ left: Number(b.dataset.scroll) * strip.clientWidth * 0.8, behavior: 'smooth' });
+    }),
+  );
+
+  const player = document.querySelector<HTMLDialogElement>('.player')!;
+  const video = player.querySelector('video')!;
+  document.querySelectorAll<HTMLButtonElement>('[data-reel]').forEach((card) => {
+    card.addEventListener('click', () => {
+      video.src = `/media/reels/${card.dataset.reel}.mp4`;
+      video.poster = `/media/reels/${card.dataset.reel}.webp`;
+      player.showModal();
+      document.dispatchEvent(new Event('lenis:stop'));
+      video.play().catch(() => {});
+    });
+  });
+  player.addEventListener('close', () => {
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    document.dispatchEvent(new Event('lenis:start'));
+  });
+  // Click fuera del video cierra
+  player.addEventListener('click', (e) => e.target === player && player.close());
+</script>

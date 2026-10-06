@@ -1,0 +1,276 @@
+@import '@fontsource-variable/manrope';
+
+@font-face {
+  font-family: 'PP Neue Machina';
+  src: url('/fonts/PPNeueMachina-Light.otf') format('opentype');
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Machina';
+  src: url('/fonts/PPNeueMachina-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Machina';
+  src: url('/fonts/PPNeueMachina-Ultrabold.otf') format('opentype');
+  font-weight: 800;
+  font-display: swap;
+}
+
+/* Paleta del manual de marca */
+:root {
+  --white: #ffffff;
+  --paper: #e9e9e9;
+  --gray: #6e6e6e;
+  --ink: #0d0d0d;
+  --olive: #96996e;
+  --ink-2: #161616;
+  --line-dark: rgba(255, 255, 255, 0.12);
+  --line-light: rgba(13, 13, 13, 0.14);
+
+  --font-display: 'PP Neue Machina', 'Manrope Variable', system-ui, sans-serif;
+  --font-body: 'Manrope Variable', system-ui, sans-serif;
+
+  --gutter: clamp(1rem, 4vw, 5rem);
+  --max: 1440px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+::selection {
+  background: var(--olive);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 3px;
+}
+
+/* ---------- Utilidades ---------- */
+
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: clamp(5rem, 11vw, 9rem);
+  position: relative;
+}
+
+.theme-dark {
+  background: var(--ink);
+  color: var(--white);
+}
+.theme-paper {
+  background: var(--paper);
+}
+.theme-olive {
+  background: var(--olive);
+}
+
+/* Etiqueta chica espaciada (ej. "TRABAJO DIRECTO") */
+.kicker {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+.theme-dark .kicker {
+  color: var(--olive);
+}
+.theme-olive .kicker {
+  color: var(--ink);
+}
+
+/* Títulos grandes en PP Neue Machina */
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  font-size: clamp(2.6rem, 7.4vw, 6.6rem);
+}
+.display--md {
+  font-size: clamp(2.2rem, 5.6vw, 4.8rem);
+}
+.olive {
+  color: var(--olive);
+}
+
+.lead {
+  font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+  line-height: 1.45;
+  max-width: 38ch;
+}
+.lead strong {
+  font-weight: 700;
+}
+
+.num {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--olive);
+}
+
+.section-head {
+  display: grid;
+  gap: 1.5rem 4rem;
+  grid-template-columns: 1fr;
+  align-items: end;
+  margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+}
+@media (min-width: 900px) {
+  .section-head {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+  .section-head > p {
+    justify-self: end;
+    text-align: right;
+    max-width: 34ch;
+  }
+}
+.section-head .kicker {
+  display: block;
+  margin-bottom: 0.9rem;
+}
+
+/* Botón tipo píldora */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.95em 1.5em;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--olive);
+  color: var(--ink);
+  transition: transform 0.4s var(--ease), background 0.3s;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  background: #a8ab80;
+}
+.btn--ghost {
+  background: transparent;
+  border: 1px solid currentColor;
+}
+.btn--ghost:hover {
+  background: var(--ink);
+  color: var(--white);
+  border-color: var(--ink);
+}
+.btn .arrow {
+  transition: transform 0.4s var(--ease);
+}
+.btn:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* ---------- Animaciones al scrollear ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+  transition-delay: var(--d, 0s);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Las líneas de los títulos suben desde una máscara */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+}
+.line-mask > span {
+  display: block;
+  transform: translateY(105%);
+  transition: transform 1.1s var(--ease);
+  transition-delay: var(--d, 0s);
+}
+.is-in .line-mask > span,
+.line-mask.is-in > span {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .line-mask > span {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
