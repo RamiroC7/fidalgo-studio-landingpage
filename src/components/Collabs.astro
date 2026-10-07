@@ -1,59 +1,55 @@
 ---
 import { collabs } from '../data/site';
+
+// Dibujos de línea de cada área (viewBox 120×90), mismo trazo que el resto del sitio
+const drawings = [
+  // Identidad: lápiz / pluma
+  `<path d="M28 74 L60 14 L92 74 Z"/><path d="M60 14 V50"/><circle cx="60" cy="58" r="4"/><path d="M22 84 H98"/>`,
+  // Publicidad: megáfono
+  `<path d="M16 36 H38 L86 16 V74 L38 54 H16 Z"/><path d="M34 54 L40 76 H50 L44 57"/><path d="M96 34 H106 M96 56 H106"/>`,
+  // Web + software: ventana de navegador
+  `<rect x="10" y="14" width="100" height="62" rx="6"/><path d="M10 28 H110"/><path d="M48 50 L38 60 L48 70 M72 50 L82 60 L72 70"/>`,
+];
+const shortText = [
+  'Logos, marca, piezas gráficas y papelería.',
+  'Campañas en Meta y Google, con reportes.',
+  'Landings, sitios y sistemas a medida.',
+];
 ---
 
 <section class="section theme-dark collabs">
   <div class="wrap">
     <div class="section-head">
       <div>
-        <span class="pill reveal">En colaboración con especialistas</span>
         <h2 class="display display--md" data-reveal>
           <span class="line-mask"><span>Más áreas.</span></span>
           <span class="line-mask"><span style="--d: 0.08s">Un mismo punto</span></span>
-          <span class="line-mask"><span style="--d: 0.16s">de contacto.</span></span>
+          <span class="line-mask olive"><span style="--d: 0.16s">de contacto.</span></span>
         </h2>
       </div>
-      <p class="reveal">
-        Además de mi trabajo directo en contenido y producción audiovisual, colaboro con profesionales especializados
-        para resolver otras necesidades del proyecto.
-      </p>
     </div>
+
+    <!-- Hilo que une las tres áreas con un único punto de contacto (solo escritorio) -->
+    <svg class="thread" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M167 2 V30 H833 V2 M500 30 V58" pathLength="1" />
+      <circle cx="500" cy="30" r="6" class="node" />
+    </svg>
 
     <ul class="cards">
       {
         collabs.map((c, i) => (
-          <li class="reveal" style={`--d: ${i * 0.08}s`}>
-            <span class="kicker">{c.area}</span>
+          <li class="card reveal" style={`--d: ${i * 0.1}s`}>
+            <svg class="draw" viewBox="0 0 120 90" aria-hidden="true" set:html={drawings[i]} />
             <h3>{c.title}</h3>
-            <p>{c.text}</p>
-            {c.tags && <small>{c.tags}</small>}
+            <p>{shortText[i]}</p>
           </li>
         ))
       }
     </ul>
-    <p class="note reveal">
-      Todos los proyectos se coordinan a través de Fidalgo Studio. Vos tenés un mismo punto de contacto y armamos el
-      equipo según lo que realmente necesite tu proyecto.
-    </p>
   </div>
 </section>
 
 <style>
-  .pill {
-    display: inline-block;
-    margin-bottom: 1.1rem;
-    padding: 0.55em 1.1em;
-    border-radius: 999px;
-    background: var(--olive);
-    color: var(--ink);
-    font-size: 0.74rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .section-head p {
-    color: rgba(255, 255, 255, 0.8);
-  }
   .cards {
     display: grid;
     gap: 1.25rem;
@@ -61,41 +57,143 @@ import { collabs } from '../data/site';
     margin: 0;
     list-style: none;
   }
-  li {
+  .card {
     display: flex;
     flex-direction: column;
-    gap: 0.7rem;
+    gap: 1.1rem;
     padding: 1.75rem;
+    border-radius: 1.5rem;
     background: var(--ink-2);
     border: 1px solid var(--line-dark);
-    transition: border-color 0.4s;
+    transition:
+      border-color 0.3s ease,
+      transform 0.2s var(--ease);
   }
-  li:hover {
-    border-color: var(--olive);
+  .card:active {
+    transform: var(--press);
+  }
+  /* Dibujo en oliva, dentro de un círculo que aparece con escala desde 0.92 */
+  .draw {
+    width: 6.5rem;
+    height: auto;
+    padding: 1.25rem;
+    border-radius: 50%;
+    background: rgba(150, 153, 110, 0.14);
+    fill: none;
+    stroke: var(--olive);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+    box-sizing: content-box;
+    transition: transform 0.6s var(--ease);
+  }
+  .draw * {
+    vector-effect: non-scaling-stroke;
+  }
+  :global(.js) .draw path,
+  :global(.js) .draw rect,
+  :global(.js) .draw circle {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.4s var(--ease-in-out);
+    transition-delay: calc(0.3s + var(--d, 0s));
+  }
+  :global(.js) .card.is-in .draw path,
+  :global(.js) .card.is-in .draw rect,
+  :global(.js) .card.is-in .draw circle {
+    stroke-dashoffset: 0;
   }
   h3 {
     font-family: var(--font-display);
     font-weight: 800;
     text-transform: uppercase;
-    font-size: clamp(1.35rem, 2vw, 1.75rem);
+    font-size: clamp(1.35rem, 2vw, 1.7rem);
     line-height: 1.02;
+    min-height: 2.1em;
+    display: flex;
+    align-items: flex-end;
   }
-  li p {
-    color: rgba(255, 255, 255, 0.72);
+  p {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.95rem;
   }
-  small {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.8rem;
+
+  /* Hilo central: conecta las tres áreas con el contacto */
+  .thread {
+    display: none;
+    width: 100%;
+    height: 3.5rem;
+    margin: 2rem 0 0;
+    fill: none;
+    stroke: var(--olive);
+    stroke-width: 1.5;
+    overflow: visible;
   }
-  .note {
-    margin-top: 2.5rem;
-    max-width: 70ch;
-    font-size: 0.92rem;
-    color: rgba(255, 255, 255, 0.6);
+  .thread path {
+    vector-effect: non-scaling-stroke;
+  }
+  .thread .node {
+    fill: var(--olive);
+    stroke: none;
+    vector-effect: non-scaling-stroke;
+  }
+  :global(.js) .thread path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.2s var(--ease-in-out) 0.2s;
+  }
+  :global(.js) .thread.is-in path {
+    stroke-dashoffset: 0;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover {
+      border-color: var(--olive);
+    }
+    .card:hover .draw {
+      transform: translateY(-4px);
+    }
   }
   @media (min-width: 900px) {
+    .thread {
+      display: block;
+    }
     .cards {
       grid-template-columns: repeat(3, 1fr);
+      margin-top: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .draw path,
+    :global(.js) .draw rect,
+    :global(.js) .draw circle,
+    :global(.js) .thread path {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+    .draw,
+    .card {
+      transition: none;
     }
   }
 </style>
+
+<script>
+  // El hilo y los dibujos se trazan al entrar en pantalla (mismo criterio que el resto del sitio)
+  const thread = document.querySelector('.collabs .thread');
+  if (thread) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            thread.classList.add('is-in');
+            io.disconnect();
+          }
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px' },
+    );
+    io.observe(thread);
+  }
+</script>

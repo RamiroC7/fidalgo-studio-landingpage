@@ -20,7 +20,8 @@ const ogImage = new URL('/og.jpg', Astro.site ?? Astro.url).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0d0d0d" />
+    <meta name="theme-color" content="#e9e9e9" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href="/fonts/PPNeueMachina-Ultrabold.otf" as="font" type="font/otf" crossorigin />
@@ -33,6 +34,7 @@ const ogImage = new URL('/og.jpg', Astro.site ?? Astro.url).href;
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
     <slot />
 
     <script>

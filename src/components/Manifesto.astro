@@ -1,6 +1,5 @@
 <section class="section theme-dark manifesto">
   <div class="wrap">
-    <span class="kicker reveal">Estética + estrategia</span>
     <p class="statement reveal">
       Transformamos ideas en piezas visuales con identidad, pensadas no solo para verse bien, sino para{' '}
       <strong>comunicar, conectar y cumplir un objetivo.</strong>
@@ -20,22 +19,18 @@
     <figcaption>Baum — video institucional</figcaption>
   </figure>
 
-  <div class="wrap bottom">
-    <p class="reveal">
-      Cada proyecto se aborda de manera personalizada, buscando entender la esencia de cada marca, su universo y lo que
-      quiere transmitir. La propuesta combina creatividad, criterio visual y estrategia en todas las etapas del proceso.
+  <!-- Cierre: una frase grande sobre el isotipo de fondo -->
+  <div class="wrap closing" data-reveal>
+    <img class="mark" src="/brand/isotipo-white.png" alt="" width="205" height="240" aria-hidden="true" />
+    <p class="quote">
+      <span class="line-mask"><span>No se trata solamente de crear contenido.</span></span>
+      <span class="line-mask olive"><span style="--d: 0.12s">Se trata de construir una identidad visual que tenga algo para decir.</span></span>
     </p>
-    <p class="quote reveal" style="--d: 0.1s">
-      <strong>No se trata solamente de crear contenido.</strong>
-      <span>Se trata de construir una identidad visual que tenga algo para decir.</span>
-    </p>
-    <img class="mark" src="/brand/isotipo-white.png" alt="" width="205" height="240" />
   </div>
 </section>
 
 <style>
   .statement {
-    margin-top: 1rem;
     font-family: var(--font-display);
     font-weight: 400;
     font-size: clamp(1.9rem, 4.4vw, 4rem);
@@ -65,38 +60,77 @@
     text-transform: uppercase;
     opacity: 0.8;
   }
-  .bottom {
+  /* Cierre: el isotipo grande de fondo y la frase al frente */
+  .closing {
     position: relative;
+    isolation: isolate;
     display: grid;
-    gap: 2.5rem 5rem;
-    color: rgba(255, 255, 255, 0.82);
-  }
-  .quote {
-    display: grid;
-    gap: 0.4rem;
-    font-size: clamp(1.15rem, 1.7vw, 1.4rem);
-    line-height: 1.4;
-    padding-left: 2rem;
-    border-left: 1px solid var(--line-dark);
-  }
-  .quote strong {
-    color: var(--white);
-  }
-  .quote span {
-    color: var(--olive);
+    align-content: center;
+    min-height: clamp(16rem, 36vw, 26rem);
+    padding-block: clamp(2rem, 5vw, 3rem);
   }
   .mark {
     position: absolute;
-    right: var(--gutter);
-    bottom: -2rem;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin-block: auto;
     width: auto;
-    height: 9rem;
-    opacity: 0.06;
+    height: clamp(15rem, 40vw, 30rem);
+    opacity: 0.09;
     pointer-events: none;
+    z-index: -1;
   }
-  @media (min-width: 900px) {
-    .bottom {
-      grid-template-columns: 1fr 1fr;
+  /* Entrada: el isotipo se hace visible sin escalar desde cero */
+  :global(.js) .mark {
+    opacity: 0;
+    scale: 0.96;
+    transition:
+      opacity 1.4s ease,
+      scale 1.6s var(--ease);
+  }
+  :global(.js) .closing.is-in .mark {
+    opacity: 0.09;
+    scale: 1;
+  }
+  /* Leve desplazamiento al scrollear: lo hace el navegador (scroll-driven), sin JS */
+  @supports (animation-timeline: view()) {
+    .mark {
+      animation: drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+  @keyframes drift {
+    from {
+      transform: translateY(-8%);
+    }
+    to {
+      transform: translateY(8%);
+    }
+  }
+  .quote {
+    position: relative;
+    display: grid;
+    gap: 0.35rem;
+    max-width: 24ch;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.7rem, 3.6vw, 3.2rem);
+    line-height: 1.08;
+    color: var(--white);
+  }
+  .quote .olive {
+    color: var(--olive);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .mark {
+      opacity: 0.09;
+      scale: none;
+      transition: none;
+    }
+    .mark {
+      animation: none;
     }
   }
 </style>

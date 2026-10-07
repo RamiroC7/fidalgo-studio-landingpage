@@ -25,9 +25,54 @@ import { contact } from '../data/site';
     background: var(--olive);
     color: var(--ink);
     box-shadow: 0 12px 30px -10px rgba(13, 13, 13, 0.5);
-    transition: transform 0.4s var(--ease);
+    transition:
+      transform 0.2s var(--ease),
+      background-color 0.2s ease,
+      opacity 0.25s ease,
+      scale 0.35s var(--ease),
+      visibility 0.35s;
   }
-  .fab:hover {
-    transform: scale(1.08);
+  /* En el hero no aparece (ya tiene su CTA y se superponía al panel): entra al pasarlo.
+     Se usa `scale` para mostrar/ocultar y `transform` para hover/press, así no se pisan. */
+  :global(.js) .fab:not(.is-visible) {
+    opacity: 0;
+    scale: 0.85;
+    visibility: hidden;
+  }
+  .fab:active {
+    transform: scale(0.94);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .fab:hover {
+      background: var(--olive-light);
+      transform: scale(1.06);
+    }
+    .fab:active {
+      transform: scale(0.97);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fab {
+      transition:
+        opacity 0.2s ease,
+        visibility 0.2s;
+    }
+    :global(.js) .fab:not(.is-visible) {
+      scale: 1;
+    }
   }
 </style>
+
+<script>
+  const fab = document.querySelector<HTMLAnchorElement>('.fab')!;
+  const hero = document.querySelector('.hero');
+  if (hero) {
+    // Visible apenas el hero deja de verse en su mayor parte
+    new IntersectionObserver(([entry]) => fab.classList.toggle('is-visible', !entry.isIntersecting), {
+      threshold: 0,
+      rootMargin: '0px 0px -40% 0px',
+    }).observe(hero);
+  } else {
+    fab.classList.add('is-visible');
+  }
+</script>

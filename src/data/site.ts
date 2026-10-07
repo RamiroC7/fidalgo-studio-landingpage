@@ -71,18 +71,15 @@ export const skills = [
 
 export const collabs = [
   {
-    area: 'Diseño',
     title: 'Identidad visual + diseño',
     text: 'Branding e identidad, logotipos, diseño gráfico y editorial, packaging, merchandising, papelería corporativa y motion graphics.',
     tags: 'Brochures · menús · portadas · banners · stands · cartelería · folletos',
   },
   {
-    area: 'Performance',
     title: 'Publicidad digital',
     text: 'Meta Ads, Google Ads, estrategia de campañas, segmentación, optimización y reportes.',
   },
   {
-    area: 'Tecnología',
     title: 'Web + software',
     text: 'Landing pages, sitios web, plataformas, sistemas a medida y soluciones digitales con IA.',
   },

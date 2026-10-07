@@ -9,7 +9,6 @@ import Work from '../components/Work.astro';
 import Reels from '../components/Reels.astro';
 import Services from '../components/Services.astro';
 import Skills from '../components/Skills.astro';
-import Collabs from '../components/Collabs.astro';
 import Process from '../components/Process.astro';
 import Proposals from '../components/Proposals.astro';
 import Contact from '../components/Contact.astro';
@@ -18,7 +17,7 @@ import WhatsAppFab from '../components/WhatsAppFab.astro';
 
 <Base>
   <Header />
-  <main>
+  <main id="contenido" tabindex="-1">
     <Hero />
     <Marquee />
     <About />
@@ -27,7 +26,6 @@ import WhatsAppFab from '../components/WhatsAppFab.astro';
     <Reels />
     <Services />
     <Skills />
-    <Collabs />
     <Process />
     <Proposals />
     <Contact />
@@ -37,20 +35,36 @@ import WhatsAppFab from '../components/WhatsAppFab.astro';
 
 <script>
   // Los videos marcados con data-autoplay se reproducen solo cuando están en pantalla.
+  // Con "reducir movimiento" no se reproduce nada solo: queda el póster.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const videos = document.querySelectorAll<HTMLVideoElement>('video[data-autoplay]');
-  const io = new IntersectionObserver(
-    (entries) => {
-      for (const { target, isIntersecting } of entries) {
-        const v = target as HTMLVideoElement;
-        if (isIntersecting) {
-          if (v.preload === 'none') v.preload = 'auto';
-          v.play().catch(() => {});
-        } else {
-          v.pause();
+
+  if (reduceMotion) {
+    videos.forEach((v) => {
+      v.removeAttribute('autoplay');
+      v.pause();
+    });
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const { target, isIntersecting } of entries) {
+          const v = target as HTMLVideoElement;
+          if (isIntersecting) {
+            if (v.preload === 'none') v.preload = 'auto';
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+          }
         }
-      }
-    },
-    { threshold: 0.25 },
-  );
-  videos.forEach((v) => io.observe(v));
+      },
+      { threshold: 0.25 },
+    );
+    videos.forEach((v) => io.observe(v));
+  }
 </script>
+
+<style>
+  main:focus {
+    outline: none;
+  }
+</style>
