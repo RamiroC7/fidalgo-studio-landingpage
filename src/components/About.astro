@@ -1,71 +1,236 @@
 ---
 import { aboutTags } from '../data/site';
+
+// Iconos de línea (mismo trazo que el hero) para cada servicio, en el orden de aboutTags
+const icons = [
+  // Creación de contenido: lamparita
+  `<path d="M30 8 C15 8 8 20 8 32 C8 45 18 51 20 62 H40 C42 51 52 45 52 32 C52 20 45 8 30 8 Z"/><path d="M21 70 H39 M22 78 H38"/>`,
+  // Fotografía: cámara
+  `<path d="M14 14 L19 8 H41 L46 14"/><rect x="4" y="14" width="52" height="34" rx="5"/><circle cx="30" cy="31" r="10"/>`,
+  // Video: cámara de cine
+  `<rect x="4" y="16" width="36" height="26" rx="3"/><path d="M40 22 L54 16 V36 L40 30 Z"/><path d="M14 42 L8 56 M14 42 L24 56 M14 42 V56"/>`,
+  // Edición: claqueta
+  `<rect x="4" y="22" width="52" height="34" rx="2"/><path d="M4 30 H56"/><path d="M4 22 L10 12 H56 L50 22" />`,
+  // Comunicación: micrófono
+  `<rect x="22" y="4" width="16" height="28" rx="8"/><path d="M14 22 Q14 38 30 38 Q46 38 46 22"/><path d="M30 38 V50 M22 52 H38"/>`,
+];
+// viewBox ajustado al trazo de cada icono, para que quede centrado en su baldosa
+const viewBoxes = ['6 6 48 74', '2 6 56 44', '2 14 54 44', '2 10 56 48', '12 2 40 52'];
+const drawable = (svg: string) => svg.replace(/<(path|rect|circle)\b/g, '<$1 pathLength="1"');
 ---
 
 <section class="section about" id="sobre-mi">
   <div class="wrap grid">
-    <div>
-      <span class="kicker reveal">Dirección creativa / Tomás Fidalgo</span>
+    <div class="intro">
       <h2 class="display display--md title" data-reveal>
         <span class="line-mask"><span>Hola, soy</span></span>
         <span class="line-mask"><span style="--d: 0.08s">Tomás Fidalgo.</span></span>
       </h2>
       <p class="lead reveal">
-        Soy creador de contenido, fotógrafo, videógrafo y editor. Trabajo junto a marcas y proyectos desarrollando
-        contenido visual y audiovisual que combina <strong>creatividad, estrategia y una identidad cuidada.</strong>
+        Creador de contenido, fotógrafo, videógrafo y editor. <strong>Del concepto a la pieza final.</strong>
       </p>
-    </div>
-    <div class="side reveal" style="--d: 0.15s">
-      <p>
-        Desde Fidalgo Studio participo en todo el proceso: desde pensar qué comunicar hasta producir, grabar,
-        fotografiar y editar las piezas que lo hacen posible.
-      </p>
-      <p>
-        Cuando un proyecto necesita otras especialidades, coordino el trabajo con profesionales en diseño, publicidad y
-        desarrollo digital.
-      </p>
-      <ul class="tags">
-        {aboutTags.map((tag) => <li>{tag}</li>)}
+      <ul class="services">
+        {
+          aboutTags.map((tag, i) => (
+            <li class="reveal" style={`--d: ${0.15 + i * 0.06}s`}>
+              <span class="ico">
+                <svg viewBox={viewBoxes[i]} aria-hidden="true" set:html={drawable(icons[i] ?? '')} />
+              </span>
+              <span>{tag}</span>
+            </li>
+          ))
+        }
       </ul>
     </div>
+
+    <figure class="art reveal" aria-hidden="true">
+      <svg viewBox="0 0 160 112">
+        <path d="M52 30 L60 15 H100 L108 30" pathLength="1" />
+        <rect x="10" y="30" width="140" height="72" rx="10" pathLength="1" />
+        <rect x="20" y="40" width="20" height="11" rx="2" pathLength="1" />
+        <rect x="116" y="21" width="18" height="9" rx="2" pathLength="1" />
+        <circle cx="80" cy="66" r="28" pathLength="1" />
+        <circle cx="80" cy="66" r="19" pathLength="1" />
+        <path d="M71 59 A11 11 0 0 1 82 55" pathLength="1" />
+        <path d="M130 40 V92" pathLength="1" />
+      </svg>
+    </figure>
   </div>
 </section>
 
 <style>
   .grid {
     display: grid;
-    gap: 3rem 6rem;
+    gap: 3.5rem 5rem;
+    align-items: center;
   }
   .title {
-    margin: 0.9rem 0 2rem;
+    margin-bottom: 1.75rem;
   }
-  .side {
+  .lead {
+    max-width: 30ch;
+    font-family: var(--font-apple);
+    font-weight: 500;
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    line-height: 1.25;
+    letter-spacing: -0.022em;
+  }
+  .lead strong {
+    font-weight: 600;
+  }
+
+  /* Servicios: lista corta, cada uno con su icono de línea */
+  .services {
     display: grid;
-    gap: 1.1rem;
-    align-content: end;
-    max-width: 52ch;
-    color: #333;
-  }
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
+    gap: 0.9rem;
+    margin: 2.5rem 0 0;
     padding: 0;
-    margin: 1.2rem 0 0;
     list-style: none;
   }
-  .tags li {
-    padding: 0.55em 1.1em;
-    border: 1px solid var(--line-light);
-    border-radius: 999px;
-    font-size: 0.85rem;
+  .services li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
-    color: var(--ink);
-    box-shadow: inset 0 0 0 4px var(--white), inset 0 0 0 5px var(--line-light);
   }
+  /* Cada icono va en una baldosa oliva: el color de marca entra en la lista */
+  .ico {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 1rem;
+    background: var(--olive);
+    transition:
+      background-color 0.25s ease,
+      transform 0.16s var(--ease);
+  }
+  .ico:active {
+    transform: var(--press);
+  }
+  .services svg {
+    width: 2rem;
+    height: 2rem;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+    transition: stroke 0.25s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .services li:hover .ico {
+      background: var(--ink);
+    }
+    .services li:hover svg {
+      stroke: var(--olive);
+    }
+  }
+  /* Entrada: cada baldosa aparece con un leve escalado, nunca desde cero */
+  :global(.js) .services li .ico {
+    transform: scale(0.92);
+  }
+  :global(.js) .services li.is-in .ico {
+    transform: none;
+  }
+
+  /* Dibujo grande: se traza al entrar en pantalla, igual que el hero */
+  .art {
+    position: relative;
+    isolation: isolate;
+    margin: 0;
+    justify-self: center;
+    width: min(100%, 26rem);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+  }
+  /* El dibujo ocupa el centro del círculo, así queda con aire alrededor */
+  .art svg {
+    width: 68%;
+  }
+  /* Fondo oliva detrás del dibujo: aparece con una escala que arranca en 0.92 */
+  .art::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 50%;
+    background: var(--olive);
+    transform: scale(0.92);
+    opacity: 0;
+    transition:
+      transform 1s var(--ease) 0.1s,
+      opacity 0.8s var(--ease) 0.1s;
+  }
+  .art.is-in::before {
+    transform: none;
+    opacity: 1;
+  }
+  /* Al pasar el mouse el dibujo se levanta un poco, como si lo estuvieran mirando */
+  .art svg {
+    transition: transform 0.6s var(--ease);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .art:hover svg {
+      transform: translateY(-6px);
+    }
+  }
+  .art svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+  }
+  .art svg * {
+    vector-effect: non-scaling-stroke;
+  }
+  :global(.js) .art path,
+  :global(.js) .art rect,
+  :global(.js) .art circle {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.4s var(--ease-in-out);
+  }
+  :global(.js) .art.is-in path,
+  :global(.js) .art.is-in rect,
+  :global(.js) .art.is-in circle {
+    stroke-dashoffset: 0;
+  }
+  .art path:nth-child(2),
+  .art rect:nth-child(2) {
+    transition-delay: 0.1s;
+  }
+  .art path:nth-child(n + 3),
+  .art rect:nth-child(n + 3),
+  .art circle:nth-child(n + 3) {
+    transition-delay: 0.25s;
+  }
+
   @media (min-width: 960px) {
     .grid {
-      grid-template-columns: 1.15fr 1fr;
+      grid-template-columns: 1.1fr 1fr;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .services li .ico,
+    .art::before {
+      transform: none;
+      transition: opacity 0.4s ease;
+    }
+    :global(.js) .art path,
+    :global(.js) .art rect,
+    :global(.js) .art circle {
+      stroke-dashoffset: 0;
+      transition: none;
     }
   }
 </style>

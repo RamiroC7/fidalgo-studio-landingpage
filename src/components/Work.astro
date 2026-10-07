@@ -2,6 +2,7 @@
 import type { ImageMetadata } from 'astro';
 import { Image, getImage } from 'astro:assets';
 import { projects } from '../data/site';
+import Icon from './Icon.astro';
 
 // Fotos generadas por `npm run media` en src/assets/work/<slug>/NN.jpg
 const files = import.meta.glob<{ default: ImageMetadata }>('/src/assets/work/*/*.jpg', { eager: true });
@@ -27,7 +28,6 @@ const items = await Promise.all(
   <div class="wrap">
     <div class="section-head">
       <div>
-        <span class="kicker reveal">Trabajos seleccionados</span>
         <h2 class="display" data-reveal>
           <span class="line-mask"><span>Portfolio.</span></span>
         </h2>
@@ -54,8 +54,8 @@ const items = await Promise.all(
               <span class="meta">{p.category}</span>
               <span class="meta services">{p.services}</span>
               <span class="year">{p.year}</span>
-              <span class="go" aria-hidden="true">
-                ↗
+              <span class="go">
+                <Icon name="arrow-up-right" />
               </span>
             </button>
           </li>
@@ -78,10 +78,12 @@ const items = await Promise.all(
             </p>
           </div>
           <form method="dialog">
-            <button class="g-close">Cerrar ✕</button>
+            <button class="g-close">
+              Cerrar <Icon name="close" />
+            </button>
           </form>
         </header>
-        <div class="g-track" data-lenis-prevent>
+        <div class="g-track" data-lenis-prevent tabindex="0" role="region" aria-label={`Fotos de ${p.client}, desplazables`}>
           {p.photos.map((photo, i) => (
             <Image
               src={photo}
@@ -92,7 +94,9 @@ const items = await Promise.all(
             />
           ))}
         </div>
-        <p class="g-hint wrap">Deslizá para ver más →</p>
+        <p class="g-hint wrap">
+          Deslizá para ver más <Icon name="arrow-right" />
+        </p>
       </dialog>
     ))
   }
@@ -117,13 +121,20 @@ const items = await Promise.all(
     border-radius: 999px;
   }
   .toggle button {
-    padding: 0.5em 1.1em;
+    min-height: 2.5rem;
+    padding: 0.5em 1.2em;
     border-radius: 999px;
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    transition: background 0.3s, color 0.3s;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      transform 0.16s var(--ease);
+  }
+  .toggle button:active {
+    transform: var(--press);
   }
   .toggle button[aria-pressed='true'] {
     background: var(--ink);
@@ -148,7 +159,7 @@ const items = await Promise.all(
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 1s var(--ease);
+    transition: transform 0.7s var(--ease);
   }
 
   /* ----- Vista lista ----- */
@@ -164,7 +175,12 @@ const items = await Promise.all(
     align-items: center;
     gap: 0.3rem 1.5rem;
     padding: 1.6rem 0;
-    transition: padding 0.5s var(--ease), color 0.3s;
+  }
+  /* El contenido se desplaza con transform (no con padding) para no recalcular el layout */
+  [data-view='list'] .row > span {
+    transition:
+      transform 0.35s var(--ease),
+      color 0.2s ease;
   }
   [data-view='list'] .cover {
     display: none;
@@ -188,8 +204,11 @@ const items = await Promise.all(
   [data-view='list'] .go {
     grid-row: 1;
     grid-column: 3;
-    font-size: 1.6rem;
-    transition: transform 0.5s var(--ease);
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  [data-view='list'] .row:active .client {
+    color: var(--olive-deep);
   }
   @media (min-width: 900px) {
     [data-view='list'] .row {
@@ -206,11 +225,13 @@ const items = await Promise.all(
       grid-row: auto;
       grid-column: auto;
     }
-    [data-view='list'] .row:hover {
-      padding-left: 1rem;
+  }
+  @media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+    [data-view='list'] .row:hover > span:not(.go) {
+      transform: translateX(1rem);
     }
     [data-view='list'] .row:hover .client {
-      color: var(--olive);
+      color: var(--olive-deep);
     }
     [data-view='list'] .row:hover .go {
       transform: rotate(45deg);
@@ -234,8 +255,10 @@ const items = await Promise.all(
     aspect-ratio: 4 / 5;
     margin-bottom: 0.9rem;
   }
-  [data-view='grid'] .row:hover .cover img {
-    transform: scale(1.05);
+  @media (hover: hover) and (pointer: fine) {
+    [data-view='grid'] .row:hover .cover img {
+      transform: scale(1.04);
+    }
   }
   [data-view='grid'] .client {
     font-family: var(--font-display);
@@ -263,9 +286,12 @@ const items = await Promise.all(
     aspect-ratio: 4 / 5;
     pointer-events: none;
     overflow: hidden;
+    background: var(--paper);
     opacity: 0;
-    scale: 0.85;
-    transition: opacity 0.35s var(--ease), scale 0.5s var(--ease);
+    scale: 0.9;
+    transition:
+      opacity 0.25s ease,
+      scale 0.4s var(--ease);
   }
   .cursor-preview.on {
     opacity: 1;
@@ -287,10 +313,11 @@ const items = await Promise.all(
     padding: 0;
     border: 0;
     flex-direction: column;
+    overscroll-behavior: contain;
   }
   .gallery[open] {
     display: flex;
-    animation: fade 0.45s var(--ease);
+    animation: gallery-in 0.35s var(--ease);
   }
   .gallery::backdrop {
     background: var(--ink);
@@ -311,11 +338,16 @@ const items = await Promise.all(
     margin-top: 0.3rem;
   }
   .g-head p {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 0.9rem;
     margin-top: 0.5rem;
   }
   .g-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    flex-shrink: 0;
+    min-height: 2.75rem;
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -323,6 +355,19 @@ const items = await Promise.all(
     padding: 0.7em 1.2em;
     border: 1px solid var(--line-dark);
     border-radius: 999px;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      transform 0.16s var(--ease);
+  }
+  .g-close:active {
+    transform: var(--press);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .g-close:hover {
+      background: var(--white);
+      color: var(--ink);
+    }
   }
   .g-track {
     flex: 1;
@@ -330,10 +375,14 @@ const items = await Promise.all(
     display: flex;
     gap: 1rem;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     padding: 0 var(--gutter);
     scrollbar-width: thin;
     scrollbar-color: var(--olive) transparent;
+  }
+  .g-track:focus-visible {
+    outline-offset: -2px;
   }
   .g-track img {
     height: 100%;
@@ -344,15 +393,27 @@ const items = await Promise.all(
     flex-shrink: 0;
   }
   .g-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
     padding-block: 1rem 1.5rem;
     font-size: 0.75rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.6);
   }
-  @keyframes fade {
+  @keyframes gallery-in {
     from {
       opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gallery[open] {
+      animation: none;
+    }
+    .cursor-preview {
+      transition: opacity 0.2s ease;
     }
   }
 </style>

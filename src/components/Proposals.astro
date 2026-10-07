@@ -1,92 +1,229 @@
 ---
 import { proposals, contact } from '../data/site';
+import Icon from './Icon.astro';
+
+// Dibujos de línea de cada propuesta (viewBox 60×60)
+const icons = [
+  // Proyecto puntual: mira de objetivo (una toma precisa)
+  `<circle cx="30" cy="30" r="20"/><circle cx="30" cy="30" r="8"/><path d="M30 2 V12 M30 48 V58 M2 30 H12 M48 30 H58"/>`,
+  // Acompañamiento mensual: calendario con repetición
+  `<rect x="6" y="10" width="48" height="44" rx="5"/><path d="M6 22 H54 M18 4 V16 M42 4 V16"/><path d="M18 40 H24 M30 40 H36 M42 40 H48 M18 48 H24"/>`,
+  // Proyecto integral: tres áreas que se combinan
+  `<circle cx="22" cy="24" r="14"/><circle cx="38" cy="24" r="14"/><circle cx="30" cy="38" r="14"/>`,
+];
+const drawable = (svg: string) => svg.replace(/<(path|rect|circle)\b/g, '<$1 pathLength="1"');
 ---
 
 <section class="section proposals">
-  <div class="wrap">
-    <span class="kicker reveal">Cada proyecto es distinto</span>
+  <div class="wrap closing-wrap">
+    <!-- Isotipo de fondo: se desplaza suave al scrollear (scroll-driven, sin JS) -->
+    <img class="mark" src="/brand/isotipo-black.png" alt="" width="205" height="240" aria-hidden="true" />
+
     <h2 class="display title" data-reveal>
       <span class="line-mask"><span>Propuestas</span></span>
       <span class="line-mask"><span style="--d: 0.08s">personalizadas.</span></span>
     </h2>
-    <p class="lead reveal">
-      Las propuestas se arman según los objetivos, el tipo de contenido, la frecuencia, el alcance y las áreas que
-      necesite cada marca.
-    </p>
+    <p class="lead reveal">Cada propuesta se arma según tu objetivo y tu ritmo.</p>
 
     <ul class="cards">
       {
         proposals.map((p, i) => (
-          <li class="reveal" style={`--d: ${i * 0.08}s`}>
-            <span class="num">Formato {String(i + 1).padStart(2, '0')}</span>
+          <li class="card reveal" style={`--d: ${i * 0.1}s`}>
+            <span class="draw" aria-hidden="true">
+              <svg viewBox="0 0 60 60" set:html={drawable(icons[i])} />
+            </span>
             <h3>{p.title}</h3>
             <p>{p.text}</p>
-            <a href={contact.whatsappUrl(`Hola Tomás! Me interesa un ${p.title.toLowerCase()}.`)} target="_blank" rel="noopener">
-              Consultar <span aria-hidden="true">→</span>
+            <a
+              href={contact.whatsappUrl(`Hola Tomás! Me interesa un ${p.title.toLowerCase()}.`)}
+              target="_blank"
+              rel="noopener"
+              aria-label={`Consultar por ${p.title.toLowerCase()} por WhatsApp`}
+            >
+              Consultar <Icon name="arrow-right" class="arrow" />
             </a>
           </li>
         ))
       }
     </ul>
-    <p class="note reveal">
-      La propuesta final se define después de entender el proyecto. La idea es resolver lo que necesitás, no encajarte
-      en un paquete genérico.
-    </p>
   </div>
 </section>
 
 <style>
+  .closing-wrap {
+    position: relative;
+    isolation: isolate;
+  }
   .title {
-    margin: 0.9rem 0 2rem;
+    margin-bottom: 1.25rem;
+    /* En celular "personalizadas." tiene que entrar sin cortarse */
+    font-size: clamp(2.1rem, 9.2vw, 6.6rem);
   }
   .lead {
-    max-width: 50ch;
+    max-width: 40ch;
+    font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    line-height: 1.4;
   }
+
+  /* Isotipo de fondo: aparece suave y se desplaza con el scroll */
+  .mark {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: auto;
+    height: clamp(12rem, 30vw, 22rem);
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: -1;
+  }
+  @supports (animation-timeline: view()) {
+    .mark {
+      animation: drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+  @keyframes drift {
+    from {
+      transform: translateY(-10%);
+    }
+    to {
+      transform: translateY(10%);
+    }
+  }
+
   .cards {
+    position: relative;
     display: grid;
-    gap: 1.25rem;
-    margin: clamp(3rem, 6vw, 4.5rem) 0 0;
+    gap: 1rem;
+    margin: clamp(2.5rem, 6vw, 4rem) 0 0;
     padding: 0;
     list-style: none;
   }
-  li {
+  .card {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 0.7rem;
+    gap: 0.9rem;
     padding: 1.75rem;
+    border-radius: 1.5rem;
     border: 1px solid var(--line-light);
+    background: var(--white);
+    transition:
+      background-color 0.35s ease,
+      border-color 0.35s ease,
+      transform 0.2s var(--ease);
   }
+  .card:active {
+    transform: var(--press);
+  }
+
+  /* Dibujo dentro de un círculo oliva suave */
+  .draw {
+    display: grid;
+    place-items: center;
+    width: 4.6rem;
+    height: 4.6rem;
+    border-radius: 50%;
+    background: rgba(150, 153, 110, 0.18);
+    transition: background-color 0.35s ease;
+  }
+  .draw svg {
+    width: 2.6rem;
+    height: 2.6rem;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+    transition: transform 0.6s var(--ease);
+  }
+  .draw svg * {
+    vector-effect: non-scaling-stroke;
+  }
+  :global(.js) .draw path,
+  :global(.js) .draw rect,
+  :global(.js) .draw circle {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.3s var(--ease-in-out);
+    transition-delay: calc(0.3s + var(--d, 0s));
+  }
+  :global(.js) .card.is-in .draw path,
+  :global(.js) .card.is-in .draw rect,
+  :global(.js) .card.is-in .draw circle {
+    stroke-dashoffset: 0;
+  }
+
   h3 {
     font-family: var(--font-display);
     font-weight: 800;
     text-transform: uppercase;
-    font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+    font-size: clamp(1.35rem, 2.1vw, 1.75rem);
     line-height: 1.02;
+    min-height: 2.05em;
+    display: flex;
+    align-items: flex-end;
   }
-  li p {
-    color: #444;
+  .card p {
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
-  li a {
+  .card a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    align-self: flex-start;
     margin-top: auto;
-    padding-top: 1.2rem;
+    padding-block: 0.6rem;
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--ink);
   }
-  li a:hover {
-    color: var(--olive);
+  .card a :global(.arrow) {
+    transition: transform 0.3s var(--ease);
   }
-  .note {
-    margin-top: 2.5rem;
-    max-width: 70ch;
-    font-size: 0.92rem;
-    color: var(--gray);
+
+  /* Microinteracciones (solo con mouse): la tarjeta se pinta de oliva, el dibujo se levanta y la flecha avanza */
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover {
+      background: var(--olive);
+      border-color: var(--olive);
+    }
+    .card:hover .draw {
+      background: rgba(13, 13, 13, 0.12);
+    }
+    .card:hover .draw svg {
+      transform: translateY(-3px) rotate(-6deg);
+    }
+    .card a:hover :global(.arrow) {
+      transform: translateX(5px);
+    }
   }
+
   @media (min-width: 900px) {
     .cards {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mark {
+      animation: none;
+    }
+    :global(.js) .draw path,
+    :global(.js) .draw rect,
+    :global(.js) .draw circle {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+    .card,
+    .draw,
+    .draw svg {
+      transition: none;
     }
   }
 </style>

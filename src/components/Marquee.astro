@@ -2,7 +2,7 @@
 import { clients } from '../data/site';
 ---
 
-<div class="marquee theme-dark" aria-label="Marcas con las que trabajamos">
+<section class="marquee theme-dark" aria-label="Marcas con las que trabajamos">
   {
     [0, 1].map((copy) => (
       <ul class="track" aria-hidden={copy === 1 ? 'true' : undefined}>
@@ -15,7 +15,7 @@ import { clients } from '../data/site';
       </ul>
     ))
   }
-</div>
+</section>
 
 <style>
   .marquee {
@@ -33,8 +33,10 @@ import { clients } from '../data/site';
     list-style: none;
     animation: scroll 45s linear infinite;
   }
-  .marquee:hover .track {
-    animation-play-state: paused;
+  @media (hover: hover) and (pointer: fine) {
+    .marquee:hover .track {
+      animation-play-state: paused;
+    }
   }
   li {
     display: flex;

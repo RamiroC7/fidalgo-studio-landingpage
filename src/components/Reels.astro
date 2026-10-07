@@ -1,31 +1,35 @@
 ---
 import { reels, contact } from '../data/site';
+import Icon from './Icon.astro';
 ---
 
 <section class="section theme-dark reels" id="reels">
   <div class="wrap">
     <div class="section-head">
       <div>
-        <span class="kicker reveal">Video + edición</span>
         <h2 class="display" data-reveal>
           <span class="line-mask"><span>Reels.</span></span>
         </h2>
       </div>
-      <div class="reveal">
-        <p>Ideas, guion, rodaje y edición pensados para cada plataforma. Tocá un reel para verlo con sonido.</p>
+      <div class="head-side reveal">
+        <p>Tocá un reel para verlo con sonido.</p>
+        <a class="ig-link" href={contact.instagramUrl} target="_blank" rel="noopener">
+          Más en Instagram <strong>{contact.instagram}</strong> <Icon name="arrow-up-right" />
+        </a>
         <div class="arrows">
-          <button data-scroll="-1" aria-label="Reels anteriores">←</button>
-          <button data-scroll="1" aria-label="Reels siguientes">→</button>
+          <button data-scroll="-1" aria-label="Reels anteriores" disabled><Icon name="arrow-left" /></button>
+          <button data-scroll="1" aria-label="Reels siguientes"><Icon name="arrow-right" /></button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Móvil: tira deslizable. Escritorio: grilla escalonada (ver estilos) -->
   <ul class="strip" data-lenis-prevent-wheel>
     {
       reels.map((r, i) => (
-        <li class="reveal" style={`--d: ${Math.min(i, 4) * 0.06}s`}>
-          <button class="card" data-reel={r.slug} aria-label={`Ver reel de ${r.client}`}>
+        <li class="item reveal" style={`--d: ${Math.min(i, 4) * 0.06}s; --i: ${i}`}>
+          <button class="card" data-reel={r.slug} aria-label={`Ver reel de ${r.client} con sonido`}>
             <video
               src={`/media/reels/${r.slug}-preview.mp4`}
               poster={`/media/reels/${r.slug}.webp`}
@@ -36,37 +40,52 @@ import { reels, contact } from '../data/site';
               data-autoplay
             />
             <span class="play" aria-hidden="true">
-              ▶
-            </span>
-            <span class="info">
-              <span class="num">{String(i + 1).padStart(2, '0')}</span>
-              <strong>{r.client}</strong>
-              <span>{r.tag}</span>
+              <Icon name="play" />
             </span>
           </button>
+          <span class="caption">
+            <strong>{r.client}</strong>
+            <span>{r.tag}</span>
+          </span>
         </li>
       ))
     }
-    <li class="more">
+    <li class="item more">
       <a href={contact.instagramUrl} target="_blank" rel="noopener">
         <span>Más en Instagram</span>
         <strong>{contact.instagram}</strong>
-        <span class="arrow" aria-hidden="true">
-          ↗
+        <span class="arrow">
+          <Icon name="arrow-up-right" />
         </span>
       </a>
     </li>
   </ul>
 
   <dialog class="player" aria-label="Reproductor de reel">
-    <form method="dialog"><button class="p-close">Cerrar ✕</button></form>
+    <form method="dialog">
+      <button class="p-close">Cerrar <Icon name="close" /></button>
+    </form>
     <video controls playsinline></video>
   </dialog>
 </section>
 
 <style>
   .reels p {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.75);
+  }
+  .ig-link {
+    display: none;
+  }
+  @media (min-width: 900px) {
+    .head-side {
+      justify-self: end;
+      max-width: 30ch;
+      text-align: right;
+    }
+    .head-side .ig-link {
+      justify-content: flex-end;
+      width: 100%;
+    }
   }
   .arrows {
     display: none;
@@ -75,28 +94,41 @@ import { reels, contact } from '../data/site';
     justify-content: flex-end;
   }
   .arrows button {
+    display: grid;
+    place-items: center;
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
     border: 1px solid var(--line-dark);
     font-size: 1.1rem;
-    transition: background 0.3s, color 0.3s;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      opacity 0.2s ease,
+      transform 0.16s var(--ease);
   }
-  .arrows button:hover {
-    background: var(--olive);
-    color: var(--ink);
-    border-color: var(--olive);
+  .arrows button:active:not(:disabled) {
+    transform: var(--press);
   }
-  @media (min-width: 900px) {
-    .arrows {
-      display: flex;
+  .arrows button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .arrows button:hover:not(:disabled) {
+      background: var(--olive);
+      color: var(--ink);
+      border-color: var(--olive);
     }
   }
 
+  /* ---------- Móvil: tira deslizable ---------- */
   .strip {
     display: flex;
     gap: 1rem;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: var(--gutter);
     padding: 0 var(--gutter) 1.5rem;
@@ -105,34 +137,50 @@ import { reels, contact } from '../data/site';
     scrollbar-width: thin;
     scrollbar-color: var(--olive) transparent;
   }
-  .strip > li {
-    flex: 0 0 clamp(220px, 22vw, 300px);
+  .item {
+    flex: 0 0 clamp(200px, 60vw, 260px);
     scroll-snap-align: start;
+    display: grid;
+    gap: 0.75rem;
   }
   .card {
     position: relative;
     display: block;
     width: 100%;
     aspect-ratio: 9 / 16;
-    border-radius: 1rem;
+    border-radius: 0.9rem;
     overflow: hidden;
     background: var(--ink-2);
-    text-align: left;
+    transition: transform 0.16s var(--ease);
+  }
+  .card:active {
+    transform: scale(0.98);
   }
   .card video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.9s var(--ease);
+    transition: transform 0.6s var(--ease);
   }
-  .card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(13, 13, 13, 0.85), transparent 45%);
+  .card:focus-visible {
+    outline-color: var(--olive);
+    outline-offset: 4px;
   }
-  .card:hover video {
-    transform: scale(1.04);
+  /* Pie de cada reel: cliente y tipo, debajo del video (no encima, así el video se ve completo) */
+  .caption {
+    display: grid;
+    gap: 0.15rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .caption strong {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1rem;
+    line-height: 1.1;
+    color: var(--white);
+    overflow-wrap: anywhere;
   }
   .play {
     position: absolute;
@@ -141,62 +189,145 @@ import { reels, contact } from '../data/site';
     z-index: 1;
     display: grid;
     place-items: center;
-    width: 3.6rem;
-    height: 3.6rem;
-    margin: -1.8rem 0 0 -1.8rem;
-    padding-left: 0.2rem;
+    width: 3.4rem;
+    height: 3.4rem;
+    margin: -1.7rem 0 0 -1.7rem;
+    padding-left: 0.15rem;
     border-radius: 50%;
     background: var(--olive);
     color: var(--ink);
-    opacity: 0;
-    scale: 0.7;
-    transition: opacity 0.4s var(--ease), scale 0.4s var(--ease);
+    font-size: 1.2rem;
+    opacity: 0.92;
+    scale: 0.9;
+    transition:
+      opacity 0.2s ease,
+      scale 0.3s var(--ease);
   }
-  .card:hover .play,
   .card:focus-visible .play {
     opacity: 1;
     scale: 1;
   }
-  .info {
-    position: absolute;
-    inset: auto 1rem 1rem;
-    z-index: 1;
-    display: grid;
-    gap: 0.15rem;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.75);
+  /* En celular no hay hover: el play queda visible, un poco más chico */
+  @media (hover: none) {
+    .play {
+      scale: 0.8;
+    }
   }
-  .info strong {
-    font-family: var(--font-display);
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 1.05rem;
-    line-height: 1.1;
-    color: var(--white);
+  /* Mismo borde superior y mismo alto que los reels: arranca en la línea de los videos */
+  .more {
+    align-self: start;
   }
   .more a {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     gap: 0.3rem;
-    height: 100%;
+    width: 100%;
     aspect-ratio: 9 / 16;
-    padding: 1.4rem;
-    border-radius: 1rem;
+    padding: 1.2rem;
+    border-radius: 0.9rem;
     background: var(--olive);
     color: var(--ink);
+    transition:
+      background-color 0.2s ease,
+      transform 0.16s var(--ease);
+  }
+  .more a:active {
+    transform: scale(0.98);
   }
   .more strong {
     font-family: var(--font-display);
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 800;
+    overflow-wrap: anywhere;
   }
   .more .arrow {
-    font-size: 2rem;
-    transition: transform 0.5s var(--ease);
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    font-size: 1.8rem;
+    line-height: 1;
+    transition: transform 0.3s var(--ease);
   }
-  .more a:hover .arrow {
-    transform: translate(4px, -4px);
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover video {
+      transform: scale(1.04);
+    }
+    .card:hover .play {
+      opacity: 1;
+      scale: 1;
+    }
+    .more a:hover {
+      background: var(--olive-light);
+    }
+    .more a:hover .arrow {
+      transform: translate(4px, -4px);
+    }
+  }
+
+  /* ---------- Escritorio: grilla escalonada ----------
+     Cinco columnas; las filas pares se corren hacia abajo, como si los reels estuvieran
+     colgados a distinta altura. Sin tira, sin flechas: se ve todo el catálogo de una. */
+  @media (min-width: 900px) {
+    .arrows {
+      display: none;
+    }
+    .strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 2.5rem clamp(1rem, 2vw, 2rem);
+      overflow: visible;
+      padding: 0 var(--gutter) 0;
+      scroll-snap-type: none;
+    }
+    .item {
+      flex: none;
+      width: auto;
+      translate: 0 0;
+    }
+    .item:nth-child(even) {
+      translate: 0 3.5rem;
+    }
+    .card {
+      transition: transform 0.16s var(--ease);
+    }
+  }
+  @media (min-width: 900px) and (max-width: 1199px) {
+    .strip {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .item:nth-child(even) {
+      translate: 0 0;
+    }
+    .item:nth-child(3n + 2) {
+      translate: 0 3rem;
+    }
+  }
+  @media (min-width: 900px) {
+    /* Fila de la derecha: el "más" siempre queda alineado, sin desfase */
+    /* En escritorio el "más" sale de la grilla (quedaba solo en la última fila) y va como link junto al título */
+    .more {
+      display: none;
+    }
+    .ig-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.85);
+      transition: color 0.2s ease;
+    }
+    .ig-link strong {
+      color: var(--white);
+      font-weight: 700;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .ig-link:hover {
+        color: var(--olive);
+      }
+    }
   }
 
   .player {
@@ -211,6 +342,7 @@ import { reels, contact } from '../data/site';
     display: grid;
     gap: 0.8rem;
     justify-items: end;
+    animation: player-in 0.3s var(--ease);
   }
   .player::backdrop {
     background: rgba(13, 13, 13, 0.92);
@@ -224,26 +356,59 @@ import { reels, contact } from '../data/site';
     background: #000;
   }
   .p-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    min-height: 2.75rem;
+    padding-inline: 0.5rem;
+    margin-right: -0.5rem;
     color: var(--white);
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
+  @keyframes player-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .player[open] {
+      animation: none;
+    }
+    .item:nth-child(even),
+    .item:nth-child(3n + 2) {
+      translate: 0 0;
+    }
+  }
 </style>
 
 <script>
   const strip = document.querySelector<HTMLUListElement>('.strip')!;
-  document.querySelectorAll<HTMLButtonElement>('[data-scroll]').forEach((b) =>
+  const arrows = document.querySelectorAll<HTMLButtonElement>('[data-scroll]');
+  arrows.forEach((b) =>
     b.addEventListener('click', () => {
       strip.scrollBy({ left: Number(b.dataset.scroll) * strip.clientWidth * 0.8, behavior: 'smooth' });
     }),
   );
+  // Las flechas se deshabilitan al llegar a cada punta de la tira (solo móvil)
+  const updateArrows = () => {
+    const max = strip.scrollWidth - strip.clientWidth - 2;
+    arrows[0].disabled = strip.scrollLeft <= 2;
+    arrows[1].disabled = strip.scrollLeft >= max;
+  };
+  strip.addEventListener('scroll', updateArrows, { passive: true });
+  window.addEventListener('resize', updateArrows);
+  updateArrows();
 
   const player = document.querySelector<HTMLDialogElement>('.player')!;
   const video = player.querySelector('video')!;
+  let opener: HTMLElement | null = null;
   document.querySelectorAll<HTMLButtonElement>('[data-reel]').forEach((card) => {
     card.addEventListener('click', () => {
+      opener = card;
       video.src = `/media/reels/${card.dataset.reel}.mp4`;
       video.poster = `/media/reels/${card.dataset.reel}.webp`;
       player.showModal();
@@ -256,6 +421,7 @@ import { reels, contact } from '../data/site';
     video.removeAttribute('src');
     video.load();
     document.dispatchEvent(new Event('lenis:start'));
+    opener?.focus();
   });
   // Click fuera del video cierra
   player.addEventListener('click', (e) => e.target === player && player.close());

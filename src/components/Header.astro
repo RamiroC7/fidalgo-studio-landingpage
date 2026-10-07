@@ -1,41 +1,86 @@
 ---
 import { nav, contact } from '../data/site';
+import Icon from './Icon.astro';
+
+// Reel que se muestra en el menú al pasar por cada link (previews livianos de /media/reels)
+const previews: Record<string, string> = {
+  '#trabajos': 'hola-manola',
+  '#reels': 'imperial',
+  '#servicios': 'rich-medallones',
+  '#proceso': 'la-base-mkt',
+  '#contacto': 'crea-bijou-party-box',
+};
 ---
 
 <header class="header">
   <div class="bar wrap">
-    <a href="#top" class="logo" aria-label="Fidalgo Studio, volver arriba">
-      <img src="/brand/logo-black.png" alt="Fidalgo Studio" width="1000" height="381" />
-    </a>
-    <nav class="links" aria-label="Principal">
-      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
-    </nav>
-    <a class="cta" href={contact.whatsappUrl()} target="_blank" rel="noopener">Contame tu proyecto <span aria-hidden="true">→</span></a>
-    <button class="menu-btn" aria-expanded="false" aria-controls="menu" data-menu-open>
-      <span class="sr-only">Abrir menú</span>
-      <span class="burger" aria-hidden="true"></span>
-    </button>
+    <div class="side side--start">
+      <button class="menu-btn" aria-expanded="false" aria-controls="menu" data-menu-open>
+        <span class="menu-label">Menú</span>
+        <span class="burger" aria-hidden="true"></span>
+      </button>
+      <a class="cta" href={contact.whatsappUrl()} target="_blank" rel="noopener">
+        Contame tu proyecto <Icon name="arrow-up-right" />
+      </a>
+    </div>
+
+    <!-- Centro: el logo aparece al scrollear (arriba de todo ya está el del hero) -->
+    <div class="center">
+      <a href="#top" class="logo" aria-label="Fidalgo Studio, volver arriba">
+        <img src="/brand/logo-black.png" alt="" width="1000" height="381" />
+      </a>
+    </div>
+
+    <div class="side side--end" aria-hidden="true"></div>
   </div>
 </header>
 
-<div class="menu theme-dark" id="menu" hidden>
+<div class="menu theme-dark" id="menu" role="dialog" aria-modal="true" aria-label="Menú" hidden>
   <div class="menu-top wrap">
-    <img src="/brand/logo-white.png" alt="" width="1000" height="381" class="menu-logo" />
-    <button class="menu-close" data-menu-close>Cerrar</button>
+    <a href="#top" class="menu-logo-link" data-menu-close aria-label="Fidalgo Studio, volver arriba">
+      <img src="/brand/logo-white.png" alt="" width="1000" height="381" class="menu-logo" />
+    </a>
+    <button class="menu-close" data-menu-close>Cerrar <Icon name="close" /></button>
   </div>
-  <nav class="menu-links wrap" aria-label="Menú">
-    {
-      nav.map((item, i) => (
-        <a href={item.href} data-menu-close>
-          <span class="num">0{i + 1}</span>
-          {item.label}
-        </a>
-      ))
-    }
-  </nav>
+
+  <div class="menu-body wrap">
+    <nav class="menu-links" aria-label="Secciones">
+      {
+        nav.map((item, i) => (
+          <a href={item.href} data-menu-close data-preview={i} style={`--i: ${i}`}>
+            <span class="link-mask">
+              <span>{item.label}</span>
+            </span>
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="preview" aria-hidden="true">
+      {
+        nav.map((item, i) => (
+          <video
+            data-src={`/media/reels/${previews[item.href]}-preview.mp4`}
+            poster={`/media/reels/${previews[item.href]}.webp`}
+            muted
+            loop
+            playsinline
+            preload="none"
+            class:list={{ active: i === 0 }}
+          />
+        ))
+      }
+    </div>
+  </div>
+
   <div class="menu-foot wrap">
-    <a class="btn" href={contact.whatsappUrl()} target="_blank" rel="noopener">WhatsApp <span class="arrow">→</span></a>
-    <a href={contact.instagramUrl} target="_blank" rel="noopener">{contact.instagram}</a>
+    <a class="btn" href={contact.whatsappUrl()} target="_blank" rel="noopener">
+      Contame tu proyecto <Icon name="arrow-right" class="arrow" />
+    </a>
+    <div class="foot-links">
+      <a href={contact.instagramUrl} target="_blank" rel="noopener">{contact.instagram}</a>
+      <a href={`mailto:${contact.email}`}>{contact.email}</a>
+    </div>
   </div>
 </div>
 
@@ -47,10 +92,12 @@ import { nav, contact } from '../data/site';
     z-index: 50;
     color: var(--ink);
     pointer-events: none;
-    transition: background 0.4s, backdrop-filter 0.4s, translate 0.5s var(--ease);
+    transition:
+      background-color 0.3s ease,
+      translate 0.4s var(--ease);
   }
   .header.scrolled {
-    background: rgba(255, 255, 255, 0.78);
+    background: rgba(255, 255, 255, 0.82);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     pointer-events: auto;
@@ -58,98 +105,155 @@ import { nav, contact } from '../data/site';
   .header.hide {
     translate: 0 -100%;
   }
+  /* Si el foco entra al header (tab), se muestra aunque esté escondido */
+  .header.hide:focus-within {
+    translate: 0 0;
+  }
+  /* Menú + CTA juntos a la izquierda | logo centrado (al scrollear) | columna de equilibrio */
   .bar {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
     height: 4.5rem;
   }
   .bar > * {
     pointer-events: auto;
   }
+  .side {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+  .center {
+    display: grid;
+    place-items: center;
+  }
+  .logo {
+    transition:
+      opacity 0.3s ease,
+      translate 0.4s var(--ease),
+      visibility 0.3s;
+  }
+  /* Arriba de todo el logo gigante del hero ya cumple ese rol: el chico aparece al scrollear */
+  .header:not(.scrolled) .logo {
+    opacity: 0;
+    translate: 0 6px;
+    visibility: hidden;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .logo {
+      translate: none !important;
+    }
+  }
   .logo img {
     height: 2.1rem;
     width: auto;
   }
-  .links {
-    display: none;
-    gap: 2rem;
-    margin-left: auto;
-    font-size: 0.82rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .links a,
+  /* CTA: píldora con borde, pegada al botón Menú */
   .cta {
-    position: relative;
-  }
-  .links a::after,
-  .cta::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -4px;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.5s var(--ease);
-  }
-  .links a:hover::after,
-  .cta:hover::after {
-    transform: scaleX(1);
-    transform-origin: left;
-  }
-  .cta {
-    display: none;
-    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    min-height: 2.75rem;
+    padding: 0 1.2rem;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    white-space: nowrap;
+    transition:
+      transform 0.16s var(--ease),
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
   }
-  .menu-btn {
-    margin-left: auto;
-    width: 2.75rem;
-    height: 2.75rem;
-    display: grid;
-    place-items: center;
+  .cta:active {
+    transform: var(--press);
   }
-  .burger,
-  .burger::before {
-    display: block;
-    width: 1.6rem;
-    height: 2px;
-    background: currentColor;
-  }
-  .burger {
-    position: relative;
-    transform: translateY(-4px);
-  }
-  .burger::before {
-    content: '';
-    position: absolute;
-    top: 8px;
-  }
-  @media (min-width: 960px) {
-    .links,
+  /* En celular entra igual al lado del Menú, un poco más compacta */
+  @media (max-width: 559px) {
     .cta {
-      display: flex;
+      padding: 0 0.9rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
     }
-    .menu-btn {
+    .cta :global(svg) {
+      display: none;
+    }
+    /* Al scrollear el logo ocupa el centro: el CTA se oculta para que no se superponga */
+    .header.scrolled .cta {
       display: none;
     }
   }
 
+  /* Botón "Menú": píldora con la palabra y dos líneas */
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-height: 2.75rem;
+    padding: 0 1.1rem 0 1.25rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--white);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition:
+      transform 0.16s var(--ease),
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .menu-btn:active {
+    transform: var(--press);
+  }
+  .burger,
+  .burger::before {
+    display: block;
+    width: 1.15rem;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.3s var(--ease);
+  }
+  .burger {
+    position: relative;
+    transform: translateY(-3px);
+  }
+  .burger::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .cta:hover {
+      background: var(--ink);
+      color: var(--white);
+      border-color: var(--ink);
+    }
+    .menu-btn:hover {
+      background: var(--olive);
+      color: var(--ink);
+    }
+    .menu-btn:hover .burger::before {
+      transform: scaleX(0.6);
+    }
+  }
+
+  /* ---------- Menú a pantalla completa ---------- */
   .menu {
     position: fixed;
     inset: 0;
     z-index: 60;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding-block: 0 2rem;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .menu[hidden] {
     display: none;
@@ -165,46 +269,277 @@ import { nav, contact } from '../data/site';
     width: auto;
   }
   .menu-close {
-    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 2.75rem;
+    padding: 0 1.1rem 0 1.25rem;
+    border-radius: 999px;
+    border: 1px solid var(--line-dark);
+    font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    transition:
+      transform 0.16s var(--ease),
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .menu-close:active {
+    transform: var(--press);
+  }
+
+  .menu-body {
+    display: grid;
+    align-items: center;
+    gap: 2rem;
+    padding-block: 2rem;
   }
   .menu-links {
     display: grid;
-    gap: 0.4rem;
+    justify-items: start;
   }
   .menu-links a {
     font-family: var(--font-display);
     font-weight: 800;
     text-transform: uppercase;
-    font-size: clamp(2.4rem, 11vw, 4rem);
-    line-height: 1.05;
-    display: flex;
-    align-items: baseline;
-    gap: 0.8rem;
+    font-size: clamp(2.6rem, 12vw, 7.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    transition:
+      color 0.25s ease,
+      opacity 0.25s ease;
   }
+  .menu-links a:active {
+    color: var(--olive);
+  }
+  /* Cada palabra sube desde una máscara, con espacio arriba para la tilde */
+  .link-mask {
+    display: block;
+    overflow: hidden;
+    padding-top: 0.12em;
+  }
+  .link-mask > span {
+    display: block;
+  }
+
+  /* Vista previa: un reel vertical por link, en fundido cruzado */
+  .preview {
+    display: none;
+    position: relative;
+    justify-self: end;
+    width: min(22vw, 320px);
+    aspect-ratio: 9 / 16;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    background: var(--ink-2);
+  }
+  .preview video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1.06);
+    transition:
+      opacity 0.45s ease,
+      transform 0.8s var(--ease);
+  }
+  .preview video.active {
+    opacity: 1;
+    transform: none;
+  }
+
   .menu-foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 1rem 2rem;
     flex-wrap: wrap;
+  }
+  .foot-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.75rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.95rem;
+  }
+  .foot-links a {
+    padding-block: 0.5rem;
+    transition: color 0.2s ease;
+  }
+
+  @media (min-width: 900px) {
+    .menu-body {
+      grid-template-columns: 1fr auto;
+    }
+    .preview {
+      display: block;
+    }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    /* Al pasar por un link, los demás se apagan */
+    .menu-links:hover a:not(:hover) {
+      opacity: 0.3;
+    }
+    .menu-links a:hover {
+      color: var(--olive);
+    }
+    .menu-close:hover {
+      background: var(--white);
+      color: var(--ink);
+    }
+    .foot-links a:hover {
+      color: var(--olive);
+    }
+  }
+
+  /* ---------- Entrada y salida ---------- */
+  /* Entrada: cortina de arriba hacia abajo, después suben los links escalonados */
+  .menu.is-open {
+    animation: curtain-in 0.6s var(--ease-in-out) both;
+  }
+  .menu.is-open .link-mask > span {
+    animation: rise 0.7s var(--ease) both;
+    animation-delay: calc(0.25s + var(--i) * 0.05s);
+  }
+  .menu.is-open .preview {
+    animation: fade-up 0.7s var(--ease) 0.35s both;
+  }
+  .menu.is-open .menu-foot {
+    animation: fade 0.5s ease 0.45s both;
+  }
+  /* Salida: más rápida que la entrada, la cortina se recoge hacia arriba */
+  .menu.is-closing {
+    animation: curtain-out 0.4s var(--ease-in-out) both;
+  }
+  @keyframes curtain-in {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes curtain-out {
+    from {
+      clip-path: inset(0 0 0 0);
+    }
+    to {
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+  @keyframes rise {
+    from {
+      transform: translateY(110%);
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .menu.is-open,
+    .menu.is-closing,
+    .menu.is-open .link-mask > span,
+    .menu.is-open .preview,
+    .menu.is-open .menu-foot {
+      animation: none;
+    }
+    .menu.is-open {
+      animation: fade 0.2s ease both;
+    }
   }
 </style>
 
 <script>
   const menu = document.getElementById('menu')!;
   const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]')!;
-  const setOpen = (open: boolean) => {
-    menu.hidden = !open;
-    openBtn.setAttribute('aria-expanded', String(open));
-    document.body.style.overflow = open ? 'hidden' : '';
-    document.dispatchEvent(new Event(open ? 'lenis:stop' : 'lenis:start'));
+  const videos = [...menu.querySelectorAll<HTMLVideoElement>('.preview video')];
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const showsPreview = window.matchMedia('(min-width: 900px)');
+  let closing = 0;
+
+  // Reproduce solo el reel activo; carga los videos recién la primera vez que se abre el menú
+  const setPreview = (index: number) => {
+    videos.forEach((v, i) => {
+      const on = i === index;
+      v.classList.toggle('active', on);
+      if (on && showsPreview.matches && !reduceMotion) {
+        if (!v.src) v.src = v.dataset.src!;
+        v.play().catch(() => {});
+      } else {
+        v.pause();
+      }
+    });
   };
-  openBtn.addEventListener('click', () => setOpen(true));
-  menu.querySelectorAll('[data-menu-close]').forEach((el) => el.addEventListener('click', () => setOpen(false)));
-  document.addEventListener('keydown', (e) => e.key === 'Escape' && !menu.hidden && setOpen(false));
+
+  const open = () => {
+    clearTimeout(closing);
+    menu.classList.remove('is-closing');
+    menu.hidden = false;
+    menu.classList.add('is-open');
+    openBtn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    document.dispatchEvent(new Event('lenis:stop'));
+    setPreview(0);
+    menu.querySelector<HTMLElement>('.menu-close')!.focus();
+  };
+
+  const close = (returnFocus = true) => {
+    if (menu.hidden || menu.classList.contains('is-closing')) return;
+    openBtn.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    document.dispatchEvent(new Event('lenis:start'));
+    menu.classList.remove('is-open');
+    menu.classList.add('is-closing');
+    const finish = () => {
+      menu.hidden = true;
+      menu.classList.remove('is-closing');
+      videos.forEach((v) => v.pause());
+    };
+    // Espera a que termine la cortina de salida (sin animación, cierra al instante)
+    closing = window.setTimeout(finish, reduceMotion ? 0 : 400);
+    if (returnFocus) openBtn.focus({ preventScroll: true });
+  };
+
+  openBtn.addEventListener('click', open);
+  menu.querySelector('.menu-close')!.addEventListener('click', () => close());
+  // Los links cierran el menú y dejan que el ancla haga su scroll
+  menu.querySelectorAll<HTMLAnchorElement>('a[data-menu-close]').forEach((a) =>
+    a.addEventListener('click', () => close(false)),
+  );
+  menu.querySelectorAll<HTMLAnchorElement>('[data-preview]').forEach((a) => {
+    const show = () => setPreview(Number(a.dataset.preview));
+    a.addEventListener('mouseenter', show);
+    a.addEventListener('focus', show);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (menu.hidden) return;
+    if (e.key === 'Escape') close();
+    // Mantiene el foco dentro del menú abierto
+    if (e.key === 'Tab') {
+      const items = [...menu.querySelectorAll<HTMLElement>('a, button')];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  });
 
   // Fondo al scrollear y se esconde al bajar (reaparece al subir)
   const header = document.querySelector<HTMLElement>('.header')!;
@@ -212,8 +547,11 @@ import { nav, contact } from '../data/site';
   const onScroll = () => {
     const y = window.scrollY;
     header.classList.toggle('scrolled', y > 40);
-    header.classList.toggle('hide', y > 400 && y > lastY);
-    lastY = y;
+    // Umbral de 6px para que no tiemble con scrolls mínimos
+    if (Math.abs(y - lastY) > 6) {
+      header.classList.toggle('hide', y > 400 && y > lastY);
+      lastY = y;
+    }
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();

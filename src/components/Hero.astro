@@ -1,129 +1,674 @@
 ---
-import { contact } from '../data/site';
+import { clients, contact } from '../data/site';
+import Icon from './Icon.astro';
+import logo from '../../public/brand/logo.svg?raw';
+
+// Dibujos de línea del equipo de estudio llenando la zona clara, con el logo al medio.
+// Desktop: x/y en % del ancho de la zona, ancho en cqw. Mobile/tablet (m*): ancho en svh. mw = 0 → solo desktop.
+// "depth" = cuánto se mueven con el mouse y al scrollear (las más cercanas, más).
+const art = {
+  camera: `<svg viewBox="0 0 160 112">
+    <path d="M52 30 L60 15 H100 L108 30"/>
+    <rect x="10" y="30" width="140" height="72" rx="10"/>
+    <rect class="flash-window" x="20" y="40" width="20" height="11" rx="2"/>
+    <rect x="116" y="21" width="18" height="9" rx="2"/>
+    <circle cx="80" cy="66" r="28"/>
+    <circle cx="80" cy="66" r="19"/>
+    <path d="M71 59 A11 11 0 0 1 82 55"/>
+    <path d="M130 40 V92"/>
+    <g class="burst"><path d="M30 30 V18"/><path d="M19 33 L11 25"/><path d="M41 33 L49 25"/></g>
+  </svg>`,
+  softbox: `<svg viewBox="0 0 100 200">
+    <rect class="glow" x="22" y="20" width="56" height="50"/>
+    <rect x="14" y="12" width="72" height="66" rx="3"/>
+    <rect x="22" y="20" width="56" height="50"/>
+    <path d="M44 78 H56 V92 H44 Z"/>
+    <path d="M50 92 V168"/>
+    <path d="M50 168 L22 194 M50 168 L78 194 M50 168 V194"/>
+  </svg>`,
+  clapper: `<svg viewBox="0 0 150 130">
+    <rect x="12" y="46" width="126" height="76" rx="4"/>
+    <path d="M12 66 H138"/>
+    <path d="M26 84 H70 M26 100 H56 M88 84 H124 M88 100 H110"/>
+    <g class="stick">
+      <rect x="12" y="30" width="126" height="16" rx="2"/>
+      <path d="M34 30 L24 46 M58 30 L48 46 M82 30 L72 46 M106 30 L96 46 M130 30 L120 46"/>
+    </g>
+    <circle cx="16" cy="46" r="2.5"/>
+  </svg>`,
+  cine: `<svg viewBox="0 0 160 196">
+    <g class="reel"><circle cx="54" cy="42" r="20"/><circle cx="54" cy="42" r="4"/><path d="M54 26 V34 M40 50 L47 46 M68 50 L61 46"/></g>
+    <g class="reel"><circle cx="94" cy="42" r="20"/><circle cx="94" cy="42" r="4"/><path d="M94 26 V34 M80 50 L87 46 M108 50 L101 46"/></g>
+    <rect x="30" y="64" width="86" height="46" rx="6"/>
+    <path d="M116 75 L144 64 V110 L116 99 Z"/>
+    <rect x="16" y="76" width="14" height="20" rx="3"/>
+    <path d="M66 110 H84 V122 H66 Z"/>
+    <path d="M75 122 L42 192 M75 122 L108 192 M75 122 V192"/>
+  </svg>`,
+  film: `<svg viewBox="0 0 124 112">
+    <rect x="26" y="12" width="24" height="10" rx="2"/>
+    <rect x="14" y="22" width="48" height="70" rx="8"/>
+    <path d="M14 36 H62 M14 78 H62"/>
+    <path d="M62 40 H112 V76 H62"/>
+    <path d="M70 44 h5 M82 44 h5 M94 44 h5 M106 44 h3 M70 72 h5 M82 72 h5 M94 72 h5 M106 72 h3"/>
+    <rect x="70" y="50" width="16" height="16" rx="1.5"/>
+    <rect x="92" y="50" width="16" height="16" rx="1.5"/>
+  </svg>`,
+  mic: `<svg viewBox="0 0 60 150">
+    <rect x="17" y="8" width="26" height="46" rx="13"/>
+    <path d="M17 24 H43 M17 32 H43 M17 40 H43"/>
+    <path d="M30 54 V62"/>
+    <path d="M22 62 H38 L34 140 H26 Z"/>
+  </svg>`,
+  polaroid: `<svg viewBox="0 0 100 120">
+    <rect x="8" y="8" width="84" height="104" rx="3"/>
+    <rect x="16" y="16" width="68" height="70"/>
+    <path d="M16 76 L40 52 L56 66 L66 58 L84 74"/>
+    <circle cx="66" cy="34" r="7"/>
+  </svg>`,
+  lens: `<svg viewBox="0 0 112 90">
+    <rect x="8" y="22" width="26" height="46" rx="4"/>
+    <rect x="34" y="14" width="44" height="62" rx="4"/>
+    <rect x="78" y="8" width="24" height="74" rx="4"/>
+    <path d="M46 14 V76 M55 14 V76 M64 14 V76"/>
+  </svg>`,
+  bulb: `<svg viewBox="0 0 60 100">
+    <path d="M30 8 C15 8 8 20 8 32 C8 45 18 51 20 62 H40 C42 51 52 45 52 32 C52 20 45 8 30 8 Z"/>
+    <path d="M24 46 L30 55 L36 46"/>
+    <path d="M21 70 H39 M22 78 H38 M25 86 H35"/>
+  </svg>`,
+};
+// Cada trazo con pathLength="1" para dibujarse al entrar
+const withLength = (svg: string) => svg.replace(/<(path|rect|circle)\b/g, '<$1 pathLength="1"');
+
+type Name = keyof typeof art;
+const items: { name: Name; x: number; y: number; w: number; depth: number; mx: number; my: number; mw: number }[] = [
+  // Franja de arriba
+  { name: 'camera', x: 4, y: 12, w: 13, depth: 0.5, mx: 4, my: 10, mw: 13 },
+  { name: 'film', x: 30, y: 11, w: 8, depth: 0.3, mx: 60, my: 11, mw: 9 },
+  { name: 'polaroid', x: 51, y: 9, w: 6, depth: 0.2, mx: 38, my: 20, mw: 6.5 },
+  { name: 'lens', x: 68, y: 12, w: 7, depth: 0.35, mx: 0, my: 0, mw: 0 },
+  { name: 'softbox', x: 88, y: 8, w: 7, depth: 0.45, mx: 79, my: 21, mw: 9 },
+  // Costados del logo
+  { name: 'clapper', x: 3, y: 42, w: 10, depth: 0.6, mx: 5, my: 27, mw: 11 },
+  { name: 'mic', x: 8, y: 61, w: 3, depth: 0.4, mx: 8, my: 71, mw: 3.5 },
+  { name: 'bulb', x: 90, y: 36, w: 4, depth: 0.4, mx: 0, my: 0, mw: 0 },
+  { name: 'cine', x: 86, y: 54, w: 9, depth: 0.7, mx: 68, my: 68, mw: 11 },
+  // Franja de abajo
+  { name: 'polaroid', x: 14, y: 77, w: 6, depth: 0.8, mx: 16, my: 84, mw: 7 },
+  { name: 'softbox', x: 30, y: 74, w: 5.5, depth: 0.9, mx: 0, my: 0, mw: 0 },
+  { name: 'lens', x: 48, y: 81, w: 6, depth: 0.85, mx: 36, my: 73, mw: 7 },
+  { name: 'film', x: 64, y: 79, w: 8, depth: 0.8, mx: 52, my: 86, mw: 9 },
+  { name: 'camera', x: 81, y: 78, w: 10, depth: 0.95, mx: 0, my: 0, mw: 0 },
+];
 ---
 
-<section class="hero" id="top">
-  <div class="copy">
-    <p class="kicker reveal">Tomás Fidalgo / Portfolio + servicios</p>
-    <h1 class="display headline" data-reveal>
-      <span class="line-mask"><span>Contenido.</span></span>
-      <span class="line-mask"><span style="--d: 0.08s">Foto. Video.</span></span>
-      <span class="line-mask olive"><span style="--d: 0.16s">Estrategia.</span></span>
-    </h1>
-    <div class="actions reveal" style="--d: 0.35s">
-      <a class="btn" href="#trabajos">Ver trabajos <span class="arrow">↓</span></a>
-      <a class="btn btn--ghost" href={contact.whatsappUrl()} target="_blank" rel="noopener">Contame tu proyecto</a>
+<section class="hero" id="top" data-reveal>
+  <!-- Zona clara: logo al medio y el equipo del estudio dibujado alrededor -->
+  <div class="stage">
+    <div class="head">
+      <h1 class="title">
+        <span class="sr-only">Fidalgo Studio: contenido, foto, video y estrategia</span>
+        <span class="wordmark-mask" aria-hidden="true">
+          <span class="wordmark" set:html={logo} />
+        </span>
+      </h1>
+      <p class="lede">Contenido, foto, video y estrategia para marcas que tienen algo para decir.</p>
+    </div>
+
+    <div class="studio" aria-hidden="true">
+      {
+        items.map((it, i) => (
+          <div
+            class:list={['doodle', `doodle--${it.name}`, { 'doodle--desk': !it.mw }]}
+            style={`--x:${it.x}%;--y:${it.y}%;--w:${it.w}cqw;--mx:${it.mx}%;--my:${it.my}%;--mw:${it.mw}svh;--i:${i}`}>
+            {it.name === 'camera' ? (
+              <a class="move shot" data-depth={it.depth} href="#reels" aria-label="Ir a los reels" set:html={withLength(art[it.name])} />
+            ) : (
+              <div class="move" data-depth={it.depth} set:html={withLength(art[it.name])} />
+            )}
+          </div>
+        ))
+      }
     </div>
   </div>
 
+  <!-- Panel oliva: el reel en formato celular, con progreso y contacto -->
   <aside class="panel">
-    <span class="year">2026</span>
-    <div class="phone reveal" style="--d: 0.2s">
-      <video
-        src="/media/hero.mp4"
-        poster="/media/hero.webp"
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="metadata"
-        aria-label="Fragmentos de reels producidos por Fidalgo Studio"></video>
-    </div>
-    <div class="about reveal" style="--d: 0.45s">
-      <strong>Fidalgo Studio</strong>
-      <p>Estudio creativo enfocado en contenido, producción audiovisual y comunicación visual.</p>
-      <a href={contact.instagramUrl} target="_blank" rel="noopener">{contact.instagram}</a>
-    </div>
+    <figure class="feature">
+      <div class="phone">
+        <video
+          src="/media/hero.mp4"
+          poster="/media/hero.webp"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          data-autoplay
+          aria-label="Fragmentos de reels producidos por Fidalgo Studio"></video>
+        <div class="progress" role="slider" tabindex="0" aria-label="Avance del reel" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span></span>
+        </div>
+      </div>
+      <figcaption class="meta">
+        <a href={contact.instagramUrl} target="_blank" rel="noopener">
+          {contact.instagram} <Icon name="arrow-up-right" class="ig-arrow" />
+        </a>
+        <span>2026</span>
+      </figcaption>
+      <p class="clients"><span>Trabajamos con</span> {clients.join(' · ')}</p>
+      <a class="btn btn--ghost cta-mobile" href={contact.whatsappUrl()} target="_blank" rel="noopener">
+        Contame tu proyecto <Icon name="arrow-right" class="arrow" />
+      </a>
+    </figure>
   </aside>
+
+  <!-- Destello del "disparo" al tocar la cámara -->
+  <div class="flash" aria-hidden="true"></div>
 </section>
 
 <style>
+  /* Dos zonas como el manual: clara con textura (logo + dibujos) y oliva (reel) */
   .hero {
     display: grid;
     grid-template-columns: 1fr;
     min-height: 100svh;
+    color: var(--ink);
+  }
+  .stage {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    place-items: center;
+    min-height: 100svh;
+    padding: 4.5rem var(--gutter) 2rem;
     background: var(--white) url('/brand/textura.webp') center / cover;
+    overflow: clip;
+    /* Los dibujos miden en % del ancho de esta zona (cqw) */
+    container-type: inline-size;
   }
-  .copy {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    gap: 1.5rem;
-    padding: 7rem var(--gutter) 3rem;
+  /* Entrada: una cortina olivo se corre hacia la derecha y deja ver la zona clara */
+  :global(.js) .stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: var(--olive);
+    transform-origin: right center;
+    transform: scaleX(1);
+    pointer-events: none;
+    transition: transform 0.9s var(--ease-in-out) 0.1s;
   }
-  .headline {
-    font-size: clamp(2.7rem, 11.5vw, 9.2rem);
-  }
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-    margin-top: 1rem;
+  :global(.js) .hero:global(.is-in) .stage::after {
+    transform: scaleX(0);
   }
 
+  /* ---------- Panel oliva ---------- */
   .panel {
-    position: relative;
-    background: var(--olive);
     display: grid;
-    justify-items: center;
-    align-content: center;
-    gap: 2rem;
-    padding: 3rem var(--gutter);
+    place-items: center;
+    padding: clamp(3rem, 8vw, 4.5rem) var(--gutter);
+    background: var(--olive);
   }
-  .year {
-    position: absolute;
-    top: 1.6rem;
-    right: var(--gutter);
-    font-family: var(--font-display);
-    font-size: 1.1rem;
+  /* Entrada: el panel se abre desde el centro como un diafragma de cámara */
+  :global(.js) .panel {
+    clip-path: circle(0% at 50% 40%);
+    transition: clip-path 1.1s var(--ease) 0.35s;
+  }
+  :global(.js) .hero:global(.is-in) .panel {
+    clip-path: circle(150% at 50% 40%);
+  }
+  .feature {
+    display: grid;
+    gap: 1.1rem;
+    width: min(100%, 15.5rem);
+    margin: 0;
   }
   .phone {
-    width: min(68vw, 300px);
+    position: relative;
     aspect-ratio: 9 / 16;
     border-radius: 1.4rem;
     overflow: hidden;
     background: var(--ink);
-    box-shadow: 0 30px 60px -20px rgba(13, 13, 13, 0.55);
+    box-shadow: 0 30px 60px -24px rgba(13, 13, 13, 0.5);
   }
   .phone video {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  .about {
-    max-width: 30ch;
-    font-size: 0.98rem;
+  /* Progreso del reel: barra fina abajo; el área de click es más alta que la barra */
+  .progress {
+    position: absolute;
+    inset: auto 0 0;
+    height: 1rem;
+    display: flex;
+    align-items: flex-end;
+    cursor: pointer;
+  }
+  .progress::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.28);
+  }
+  .progress span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: var(--white);
+    transform-origin: left center;
+    transform: scaleX(0);
+  }
+  .progress:focus-visible {
+    outline-color: var(--white);
+    outline-offset: -4px;
+  }
+  :global(.js) .feature {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.8s var(--ease) 0.5s,
+      transform 1s var(--ease) 0.5s;
+  }
+  :global(.js) .hero:global(.is-in) .feature {
+    opacity: 1;
+    transform: none;
+  }
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(13, 13, 13, 0.28);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
+  .meta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding-block: 0.5rem;
+    margin-block: -0.5rem;
+  }
+  .meta :global(.ig-arrow) {
+    transition: transform 0.25s var(--ease);
+  }
+  .clients {
+    font-size: 0.78rem;
     line-height: 1.5;
+    color: rgba(13, 13, 13, 0.8);
   }
-  .about a {
-    display: inline-block;
-    margin-top: 0.8rem;
-    border-bottom: 1px solid currentColor;
+  .clients span {
+    display: block;
+    margin-bottom: 0.15rem;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
-
+  /* El CTA del panel solo en celular: en escritorio está el del header */
+  .cta-mobile {
+    justify-self: start;
+  }
+  @media (min-width: 960px) {
+    .cta-mobile {
+      display: none;
+    }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .meta a:hover :global(.ig-arrow) {
+      transform: translate(2px, -2px);
+    }
+    .cta-mobile:hover {
+      background: var(--ink);
+      color: var(--white);
+      border-color: var(--ink);
+    }
+  }
   @media (min-width: 960px) {
     .hero {
       grid-template-columns: 1fr minmax(340px, 30vw);
     }
-    .copy {
-      padding-bottom: clamp(3rem, 8vh, 6rem);
-    }
-    .headline {
-      font-size: clamp(3rem, 7.6vw, 9.2rem);
-    }
     .panel {
       padding-top: 6rem;
-      align-content: center;
     }
-    .year {
-      top: 5.6rem;
+    .feature {
+      width: min(19vw, 18.5rem);
     }
-    .phone {
-      width: min(19vw, 300px);
+    /* En desktop el logo deja aire a los costados para los dibujos */
+    .head .wordmark-mask {
+      width: min(70cqw, 40rem, 38svh * 2.62);
     }
-    /* El texto "Fidalgo Studio" se superpone al borde del panel, como en el PDF */
-    .about {
-      justify-self: start;
+  }
+
+  .head {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    justify-items: center;
+    gap: clamp(1.25rem, 3svh, 2rem);
+    text-align: center;
+    transform-origin: center;
+    will-change: transform;
+  }
+  .wordmark-mask {
+    display: block;
+    overflow: hidden;
+    width: min(84cqw, 40rem, 38svh * 2.62);
+  }
+  .wordmark {
+    display: block;
+  }
+  .wordmark :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  :global(.js) .wordmark {
+    transform: translateY(102%);
+    transition: transform 1.2s var(--ease) 0.4s;
+  }
+  :global(.js) .hero:global(.is-in) .wordmark {
+    transform: none;
+  }
+  .lede {
+    max-width: 30ch;
+    font-family: var(--font-apple);
+    font-weight: 500;
+    font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+    line-height: 1.2;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+  :global(.js) .lede {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.7s var(--ease) 0.9s,
+      transform 0.9s var(--ease) 0.9s;
+  }
+  :global(.js) .hero:global(.is-in) .lede {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---------- Dibujos ---------- */
+  .studio {
+    position: absolute;
+    inset: 0;
+    /* Solo las piezas que se pueden tocar reciben el puntero; el resto deja pasar */
+    pointer-events: none;
+  }
+  .doodle {
+    position: absolute;
+    left: var(--mx);
+    top: var(--my);
+    width: var(--mw);
+  }
+  .doodle--desk {
+    display: none;
+  }
+  .move {
+    display: block;
+    will-change: transform;
+  }
+  .shot {
+    pointer-events: auto;
+    border-radius: 0.5rem;
+  }
+  .shot:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 4px;
+  }
+  .move :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .move :global(svg *) {
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* Entrada: cada trazo se dibuja solo, escalonado por dibujo */
+  :global(.js) .move :global(:is(path, rect, circle)) {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.4s var(--ease-in-out);
+    transition-delay: calc(0.6s + var(--i) * 0.04s);
+  }
+  :global(.js) .hero:global(.is-in) .move :global(:is(path, rect, circle)) {
+    stroke-dashoffset: 0;
+  }
+
+  /* Cámara de cine: los carretes giran */
+  .doodle--cine :global(.reel) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: spin 7s linear infinite;
+  }
+  .doodle--cine :global(.reel + .reel) {
+    animation-duration: 5s;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Interacciones (solo con mouse): flash, claqueta y luz */
+  .doodle--camera :global(.burst) {
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+  .doodle--camera :global(.flash-window) {
+    transition: fill 0.12s ease;
+  }
+  .doodle--clapper :global(.stick) {
+    transform-box: fill-box;
+    transform-origin: 0 100%;
+    transform: rotate(-16deg);
+    transition: transform 0.4s var(--ease);
+  }
+  .doodle--softbox :global(.glow) {
+    fill: var(--white);
+    stroke: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .doodle--camera:hover :global(.burst) {
+      opacity: 1;
+    }
+    .doodle--camera:hover :global(.flash-window) {
+      fill: var(--white);
+    }
+    .doodle--clapper:hover :global(.stick) {
+      transform: rotate(0deg);
+      transition-duration: 0.14s;
+      transition-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+    }
+    .doodle--softbox:hover :global(.glow) {
+      opacity: 0.55;
+    }
+  }
+
+  /* Destello al tocar la cámara: solo opacidad, se dispara por clase */
+  .flash {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: var(--white);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .flash.is-on {
+    animation: flash 0.32s var(--ease) both;
+  }
+  @keyframes flash {
+    0% {
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.85;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .doodle {
+      left: var(--x);
+      top: var(--y);
+      width: var(--w);
+    }
+    .doodle--desk {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* Sin cortina, diafragma ni desplazamientos: todo queda en su lugar, con fundidos cortos */
+    :global(.js) .stage::after {
+      transition: none;
+      transform: scaleX(0);
+    }
+    :global(.js) .panel {
+      transition: none;
+      clip-path: none;
+    }
+    :global(.js) .wordmark,
+    :global(.js) .lede,
+    :global(.js) .feature {
+      transform: none;
+      transition: opacity 0.4s ease;
+    }
+    :global(.js) .move :global(:is(path, rect, circle)) {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+    .doodle--cine :global(.reel) {
+      animation: none;
+    }
+    .flash.is-on {
+      animation: none;
     }
   }
 </style>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('.hero');
+  if (hero) {
+    const stage = hero.querySelector<HTMLElement>('.stage')!;
+    const head = hero.querySelector<HTMLElement>('.head')!;
+    const flash = hero.querySelector<HTMLElement>('.flash')!;
+    const video = hero.querySelector<HTMLVideoElement>('.phone video')!;
+    const bar = hero.querySelector<HTMLElement>('.progress')!;
+    const fill = bar.querySelector<HTMLElement>('span')!;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    // Progreso del reel: la barra se actualiza con timeupdate (no con rAF) y se puede saltar con click o flechas
+    const paint = () => {
+      const ratio = video.duration ? video.currentTime / video.duration : 0;
+      fill.style.transform = `scaleX(${ratio})`;
+      bar.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
+    };
+    video.addEventListener('timeupdate', paint);
+    bar.addEventListener('click', (e) => {
+      if (!video.duration) return;
+      const r = bar.getBoundingClientRect();
+      video.currentTime = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1) * video.duration;
+    });
+    bar.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        video.currentTime += e.key === 'ArrowRight' ? 5 : -5;
+      }
+    });
+
+    // Tocar la cámara dispara el destello y después baja a los reels (el ancla hace el scroll)
+    hero.querySelector<HTMLAnchorElement>('.shot')?.addEventListener('click', () => {
+      if (reduceMotion) return;
+      flash.classList.remove('is-on');
+      void flash.offsetWidth; // reinicia la animación si se toca dos veces
+      flash.classList.add('is-on');
+    });
+
+    if (!reduceMotion) {
+      // Resorte amortiguado: cada dibujo persigue su destino (mouse + scroll) con inercia.
+      // El loop de rAF corre solo mientras hay movimiento y solo si el hero está en pantalla.
+      const parts = [...hero.querySelectorAll<HTMLElement>('.move')].map((el) => ({
+        el,
+        depth: Number(el.dataset.depth),
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+      }));
+      const K = 0.045; // rigidez del resorte
+      const F = 0.8; // amortiguación de la velocidad por frame
+      let tx = 0;
+      let ty = 0;
+      let inView = false;
+      let raf = 0;
+
+      const frame = () => {
+        const sy = Math.min(window.scrollY, window.innerHeight);
+        // El bloque del logo se achica suavemente al salir de la pantalla
+        const p = Math.min(sy / window.innerHeight, 1);
+        head.style.transform = `scale(${(1 - p * 0.12).toFixed(3)})`;
+
+        let moving = false;
+        for (const part of parts) {
+          const gx = tx * part.depth * 40;
+          const gy = ty * part.depth * 30 - sy * part.depth * 0.35;
+          part.vx = (part.vx + (gx - part.x) * K) * F;
+          part.vy = (part.vy + (gy - part.y) * K) * F;
+          part.x += part.vx;
+          part.y += part.vy;
+          if (Math.abs(part.vx) > 0.01 || Math.abs(part.vy) > 0.01 || Math.abs(gx - part.x) > 0.05 || Math.abs(gy - part.y) > 0.05) {
+            moving = true;
+          }
+          part.el.style.transform = `translate3d(${part.x.toFixed(2)}px, ${part.y.toFixed(2)}px, 0)`;
+        }
+        raf = moving ? requestAnimationFrame(frame) : 0;
+      };
+      const kick = () => {
+        if (!raf && inView) raf = requestAnimationFrame(frame);
+      };
+
+      window.addEventListener('scroll', kick, { passive: true });
+      new IntersectionObserver(([entry]) => {
+        inView = entry.isIntersecting;
+        kick();
+      }).observe(hero);
+
+      if (finePointer) {
+        stage.addEventListener('pointermove', (e) => {
+          tx = e.clientX / window.innerWidth - 0.5;
+          ty = e.clientY / window.innerHeight - 0.5;
+          kick();
+        });
+        stage.addEventListener('pointerleave', () => {
+          tx = 0;
+          ty = 0;
+          kick();
+        });
+      }
+    }
+  }
+</script>

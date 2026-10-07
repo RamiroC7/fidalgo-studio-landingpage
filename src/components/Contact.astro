@@ -1,12 +1,12 @@
 ---
 import { contact } from '../data/site';
+import Icon from './Icon.astro';
 const year = new Date().getFullYear();
 ---
 
 <section class="section theme-dark contact" id="contacto">
   <div class="wrap grid">
     <div>
-      <span class="kicker reveal">¿Tenés un proyecto?</span>
       <h2 class="display title" data-reveal>
         <span class="line-mask"><span>Comencemos</span></span>
         <span class="line-mask olive"><span style="--d: 0.08s">juntos.</span></span>
@@ -17,7 +17,8 @@ const year = new Date().getFullYear();
       </p>
     </div>
 
-    <dl class="channels reveal" style="--d: 0.15s">
+    <div class="channels reveal" style="--d: 0.15s">
+      <dl>
       <div>
         <dt>WhatsApp</dt>
         <dd><a href={contact.whatsappUrl()} target="_blank" rel="noopener">{contact.whatsappDisplay}</a></dd>
@@ -30,8 +31,11 @@ const year = new Date().getFullYear();
         <dt>Instagram</dt>
         <dd><a href={contact.instagramUrl} target="_blank" rel="noopener">{contact.instagram}</a></dd>
       </div>
-      <a class="btn" href={contact.whatsappUrl()} target="_blank" rel="noopener">Contame tu proyecto <span class="arrow">→</span></a>
-    </dl>
+      </dl>
+      <a class="btn" href={contact.whatsappUrl()} target="_blank" rel="noopener">
+        Contame tu proyecto <Icon name="arrow-right" class="arrow" />
+      </a>
+    </div>
   </div>
 
   <footer class="footer wrap">
@@ -40,6 +44,10 @@ const year = new Date().getFullYear();
       <span>Tomás Fidalgo · Dirección creativa</span>
       <span>Fidalgo Studio / {year}</span>
     </div>
+    <p class="credit">
+      Desarrollado por
+      <a href="https://keisoftware.dev" target="_blank" rel="noopener">KEI Software</a>
+    </p>
   </footer>
 </section>
 
@@ -50,19 +58,24 @@ const year = new Date().getFullYear();
     align-items: end;
   }
   .title {
-    margin: 0.9rem 0 2rem;
-    font-size: clamp(2.6rem, 10.5vw, 7.4rem);
+    margin-bottom: 2rem;
+    /* En celular "COMENCEMOS" tiene que entrar completo: 8.6vw deja margen para la palabra más larga */
+    font-size: clamp(2.2rem, 8.6vw, 7.4rem);
   }
   .lead {
     color: rgba(255, 255, 255, 0.85);
   }
   .channels {
     display: grid;
-    gap: 1.4rem;
-    margin: 0;
+    gap: 2rem;
     padding-left: 0;
   }
-  .channels > div {
+  dl {
+    display: grid;
+    gap: 1.4rem;
+    margin: 0;
+  }
+  dl > div {
     display: grid;
     gap: 0.2rem;
   }
@@ -79,12 +92,18 @@ const year = new Date().getFullYear();
     font-size: clamp(1.15rem, 1.7vw, 1.6rem);
     overflow-wrap: anywhere;
   }
-  dd a:hover {
-    color: var(--olive);
+  dd a {
+    display: inline-block;
+    padding-block: 0.2rem;
+    transition: color 0.2s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    dd a:hover {
+      color: var(--olive);
+    }
   }
   .channels .btn {
     justify-self: start;
-    margin-top: 0.8rem;
   }
   @media (min-width: 960px) {
     .grid {
@@ -120,5 +139,27 @@ const year = new Date().getFullYear();
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.55);
+  }
+  /* Crédito del desarrollo: línea final, con el estilo de la firma de KEI */
+  /* Línea a lo ancho y crédito centrado debajo */
+  .credit {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-dark);
+    font-size: 0.8rem;
+    color: #8f8f8f;
+    text-align: center;
+  }
+  .credit a {
+    margin-left: 0.25em;
+    font-weight: 700;
+    color: #5b9cf6;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .credit a:hover {
+      color: var(--white);
+    }
   }
 </style>
