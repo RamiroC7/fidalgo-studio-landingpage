@@ -46,7 +46,6 @@ const ogImage = new URL('/og.jpg', Astro.site ?? Astro.url).href;
       import Lenis from 'lenis';
 
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
       // Scroll suave (se desactiva si el usuario pidió menos movimiento)
       if (!reduceMotion) {
         const lenis = new Lenis({ anchors: { offset: -72 } });
@@ -68,6 +67,20 @@ const ogImage = new URL('/og.jpg', Astro.site ?? Astro.url).href;
       };
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
+
+      // Si se va a otra pestaña, el título la llama de vuelta
+      const pageTitle = document.title;
+      document.addEventListener('visibilitychange', () => {
+        document.title = document.hidden ? 'Fidalgo Studio - Volvé!' : pageTitle;
+      });
+
+      document.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => {
+        if (img.complete) return;
+        img.classList.add('is-loading');
+        const done = () => img.classList.remove('is-loading');
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', done, { once: true });
+      });
 
       // Aparición de elementos al entrar en pantalla
       const io = new IntersectionObserver(

@@ -184,6 +184,7 @@ const hiddenCount = Math.max(0, items.length - VISIBLE);
     overflow: hidden;
     border-radius: 1.1rem;
     background: var(--ink-2);
+    transition: transform 0.16s var(--ease);
   }
   .media :global(.photo) {
     position: absolute;
@@ -355,13 +356,43 @@ const hiddenCount = Math.max(0, items.length - VISIBLE);
     overscroll-behavior: contain;
     background: var(--ink);
     color: var(--white);
+    /* Salida más corta que la entrada; allow-discrete deja animar el cierre antes de ocultarse */
+    opacity: 0;
+    translate: 0 12px;
+    transition:
+      opacity 0.2s ease,
+      translate 0.2s var(--ease),
+      display 0.2s allow-discrete,
+      overlay 0.2s allow-discrete;
   }
   .gallery[open] {
     display: flex;
-    animation: gallery-in 0.35s var(--ease);
+    opacity: 1;
+    translate: 0 0;
+    transition-duration: 0.35s;
+  }
+  @starting-style {
+    .gallery[open] {
+      opacity: 0;
+      translate: 0 12px;
+    }
   }
   .gallery::backdrop {
     background: var(--ink);
+    opacity: 0;
+    transition:
+      opacity 0.2s ease,
+      display 0.2s allow-discrete,
+      overlay 0.2s allow-discrete;
+  }
+  .gallery[open]::backdrop {
+    opacity: 1;
+    transition-duration: 0.35s;
+  }
+  @starting-style {
+    .gallery[open]::backdrop {
+      opacity: 0;
+    }
   }
   .g-head {
     display: flex;
@@ -444,16 +475,15 @@ const hiddenCount = Math.max(0, items.length - VISIBLE);
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.55);
   }
-  @keyframes gallery-in {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
+    .gallery,
     .gallery[open] {
-      animation: none;
+      translate: none;
+    }
+    @starting-style {
+      .gallery[open] {
+        translate: none;
+      }
     }
     .media :global(.photo),
     .count,

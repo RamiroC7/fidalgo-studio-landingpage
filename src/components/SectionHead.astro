@@ -1,6 +1,6 @@
 ---
-// Encabezado de sección: (0X) + título grande con fade (blanco → gris) y el final desenfocado
-// (progressive type blur), más una frase opcional con énfasis selectivo.
+// Encabezado de sección: (0X) + título grande con fade (blanco → gris),
+// más una frase opcional con énfasis selectivo.
 interface Props {
   index: string;
   title: string;
@@ -15,9 +15,6 @@ const { index, title, on, off } = Astro.props;
     <span class="index reveal">({index})</span>
     <h2 class="h-section title" data-reveal>
       <span class="line-mask"><span class="fade-text">{title}</span></span>
-      <!-- Capas de desenfoque sobre el final de la palabra -->
-      <span class="tail t1" aria-hidden="true"></span>
-      <span class="tail t2" aria-hidden="true"></span>
     </h2>
   </div>
   {
@@ -39,34 +36,6 @@ const { index, title, on, off } = Astro.props;
   .title {
     position: relative;
     display: inline-block;
-  }
-  .tail {
-    position: absolute;
-    inset: -10% -3% -10% 0;
-    pointer-events: none;
-  }
-  .t1 {
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    mask: linear-gradient(90deg, transparent 62%, #000 78%);
-    -webkit-mask: linear-gradient(90deg, transparent 62%, #000 78%);
-  }
-  .t2 {
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    mask: linear-gradient(90deg, transparent 80%, #000 96%);
-    -webkit-mask: linear-gradient(90deg, transparent 80%, #000 96%);
-  }
-  /* En celular el desenfoque es más suave para que la última letra se siga leyendo */
-  @media (max-width: 699px) {
-    .t1 {
-      mask: linear-gradient(90deg, transparent 72%, #000 88%);
-      -webkit-mask: linear-gradient(90deg, transparent 72%, #000 88%);
-    }
-    .t2 {
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
-    }
   }
   .intro {
     max-width: 32ch;
