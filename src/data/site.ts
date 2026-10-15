@@ -1,4 +1,4 @@
-// Contenido de la landing. Los textos salen del PDF "Portfolio + Servicios 2026" de Tomás.
+// Contenido de la landing. Los textos salen del PDF "FS destacadas" (copy definitivo) de Tomás.
 import { projects as projectMedia, reels as reelMedia } from '../../scripts/media.config.mjs';
 
 const whatsappNumber = '5493815954431';
@@ -15,87 +15,90 @@ export const contact = {
 export const nav = [
   { label: 'Trabajos', href: '#trabajos' },
   { label: 'Reels', href: '#reels' },
+  { label: 'Studio', href: '#studio' },
   { label: 'Servicios', href: '#servicios' },
-  { label: 'Proceso', href: '#proceso' },
   { label: 'Contacto', href: '#contacto' },
 ];
 
-export const aboutTags = ['Creación de contenido', 'Fotografía', 'Video', 'Edición', 'Comunicación'];
+// Destacada 01 — STUDIO: tres placas. Cada línea es una lista de tramos: [texto, true] va en blanco,
+// [texto, false] en gris (selective emphasis), en el mismo orden que el copy del PDF.
+type Segment = [string, boolean];
+export const studio: { tag: string; title: [string, string]; lines: Segment[][] }[] = [
+  {
+    tag: 'Qué es',
+    title: ['Fidalgo', 'Studio'],
+    lines: [
+      [['Estudio creativo especializado en', false], ['contenido, fotografía, video y edición.', true]],
+      [['Estética + estrategia', true], ['para transformar ideas en', false], ['piezas visuales con identidad.', true]],
+    ],
+  },
+  {
+    tag: 'Quién está detrás',
+    title: ['Hola, soy', 'Tomás Fidalgo.'],
+    lines: [
+      [['Creador de contenido,', false], ['fotógrafo, videógrafo y editor.', true]],
+      [
+        ['Trabajo con marcas para entender', false],
+        ['qué quieren comunicar', true],
+        ['y encontrar la mejor manera de convertirlo en contenido.', false],
+      ],
+    ],
+  },
+  {
+    tag: 'Manifiesto',
+    title: ['Más que', 'crear contenido,'],
+    lines: [
+      [['buscamos comunicar, conectar', false], ['y reflejar la esencia de cada marca.', true]],
+      [['Construimos identidades visuales', false], ['con algo para decir.', true]],
+    ],
+  },
+];
 
+// Destacada 02 — SERVICIOS. `collab: true` = en colaboración con profesionales especializados.
 export const services = [
   {
     title: 'Creación de contenido',
     text: 'Conceptos, ideas, guiones y piezas pensadas para comunicar en redes sociales.',
-    tags: 'Reels · contenido mensual · campañas',
+    tags: ['Reels', 'Contenido mensual', 'Campañas'],
   },
   {
     title: 'Fotografía + video',
     text: 'Producciones visuales para marcas, productos, servicios y comunicación digital.',
-    tags: 'Foto · video · producción · dirección visual',
+    tags: ['Foto', 'Video', 'Producción', 'Dirección visual'],
   },
   {
     title: 'Edición audiovisual',
-    text: 'Material en bruto convertido en piezas terminadas, dinámicas y adaptadas a cada plataforma.',
-    tags: 'Reels · ads · institucional · vertical/horizontal',
+    text: 'Transformamos material en bruto en piezas terminadas, dinámicas y adaptadas a cada plataforma.',
+    tags: ['Reels', 'Ads', 'Institucional', 'Vertical / horizontal'],
   },
   {
     title: 'Estrategia de contenido',
-    text: 'Definición de qué comunicar, cómo hacerlo y qué formatos tienen sentido para cada proyecto.',
-    tags: 'Objetivos · ejes · ideas · planificación',
+    text: 'Definimos qué comunicar, cómo hacerlo y qué formatos tienen sentido para cada proyecto.',
+    tags: ['Objetivos', 'Ejes', 'Ideas', 'Planificación'],
   },
   {
     title: 'Gestión de redes sociales',
-    text: 'Planificación y coordinación de una presencia digital coherente, activa y alineada con la marca.',
-    tags: 'Calendario · copys · publicación · análisis',
-  },
-];
-
-export const skills = [
-  {
-    title: 'Fotografía + dirección visual',
-    text: 'Creo imágenes con enfoque estético y una comunicación visual clara, buscando que cada producción represente la identidad de la marca.',
+    text: 'Planificación y coordinación de una presencia digital coherente, activa y alineada con la identidad de la marca.',
+    tags: ['Calendario', 'Copys', 'Publicación', 'Análisis'],
   },
   {
-    title: 'Edición + narrativa audiovisual',
-    text: 'Trabajo ritmo, estructura, sonido e imagen para transformar material grabado en piezas que mantengan la atención y comuniquen con claridad.',
-  },
-  {
-    title: 'Comunicación + redacción creativa',
-    text: 'Desarrollo conceptos, guiones y textos adaptados a la identidad de cada marca y al formato donde va a comunicar.',
-  },
-  {
-    title: 'Estrategia + coordinación',
-    text: 'Ordeno objetivos, necesidades y recursos para que las ideas puedan convertirse en proyectos concretos, coherentes y realizables.',
-  },
-];
-
-export const collabs = [
-  {
-    title: 'Identidad visual + diseño',
-    text: 'Branding e identidad, logotipos, diseño gráfico y editorial, packaging, merchandising, papelería corporativa y motion graphics.',
-    tags: 'Brochures · menús · portadas · banners · stands · cartelería · folletos',
+    title: 'Diseño + identidad',
+    text: 'Branding, identidad visual, logotipos, diseño gráfico y editorial, packaging, merchandising y motion graphics.',
+    tags: ['Brochures', 'Menús', 'Portadas', 'Banners', 'Cartelería', 'Piezas gráficas'],
+    collab: true,
   },
   {
     title: 'Publicidad digital',
-    text: 'Meta Ads, Google Ads, estrategia de campañas, segmentación, optimización y reportes.',
+    text: 'Estrategia y gestión de campañas para potenciar la presencia y los objetivos de cada marca.',
+    tags: ['Meta Ads', 'Google Ads', 'Segmentación', 'Optimización', 'Reportes'],
+    collab: true,
   },
   {
     title: 'Web + software',
-    text: 'Landing pages, sitios web, plataformas, sistemas a medida y soluciones digitales con IA.',
+    text: 'Desarrollo de soluciones digitales adaptadas a las necesidades de cada proyecto.',
+    tags: ['Landing pages', 'Sitios web', 'Plataformas', 'Sistemas a medida', 'Soluciones con IA'],
+    collab: true,
   },
-];
-
-export const steps = [
-  { title: 'Contame', text: 'Qué estás haciendo hoy y qué te gustaría mejorar.' },
-  { title: 'Analizamos', text: 'Qué necesita realmente el proyecto y dónde está la oportunidad.' },
-  { title: 'Definimos', text: 'Qué servicios tienen sentido, sin sumar cosas porque sí.' },
-  { title: 'Coordinamos', text: 'Producción, ejecución y especialistas desde un mismo lugar.' },
-];
-
-export const proposals = [
-  { title: 'Proyecto puntual', text: 'Una producción, campaña, sesión, pieza audiovisual o necesidad concreta.' },
-  { title: 'Acompañamiento mensual', text: 'Contenido, planificación y continuidad para sostener la comunicación de la marca.' },
-  { title: 'Proyecto integral', text: 'Combinación de contenido con diseño, pauta o desarrollo digital junto a especialistas.' },
 ];
 
 export type Project = (typeof projectMedia)[number];
@@ -103,7 +106,7 @@ export type Reel = (typeof reelMedia)[number];
 export const projects: Project[] = projectMedia;
 export const reels: Reel[] = reelMedia;
 
-// Marcas para la cinta de clientes.
+// Marcas con las que trabajó (para los créditos del cierre)
 export const clients = [
   'Rich', 'Hola Manola', 'Creá Bijou', 'Cata Majul', 'Imperial', 'La Base MKT', 'KEI Software',
   'Vincent Moto Garage', 'Cruda', 'Bruce Academy', 'Luna Andina', 'Baum', 'Sunny Piletas',

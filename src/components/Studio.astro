@@ -1,0 +1,136 @@
+---
+import { studio } from '../data/site';
+import SectionHead from './SectionHead.astro';
+---
+
+<!-- Destacada 01 — STUDIO: tres placas negras con el círculo oliva visto a través de vidrio esmerilado -->
+<section class="studio" id="studio">
+  <div class="ambient" style="--gx: 80%; --gy: 40%" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <SectionHead index="03" title="Studio" on="Estética + estrategia" off="para transformar ideas en piezas visuales con identidad." />
+
+    <ol class="cards">
+      {
+        studio.map((card, i) => (
+          <li class="card reveal" style={`--d: ${i * 0.1}s`}>
+            <h3>
+              <span class="em-on">{card.title[0]}</span>
+              <span class="em-off">{card.title[1]}</span>
+            </h3>
+            {card.lines.map((line) => (
+              <p>
+                {line.map(([text, on], j) => (
+                  <span class={on ? 'em-on' : 'em-off'}>
+                    {j > 0 && ' '}
+                    {text}
+                  </span>
+                ))}
+              </p>
+            ))}
+            <span class="circle" aria-hidden="true" />
+            <span class="frost glass" aria-hidden="true" />
+            <span class="tag">
+              {String(i + 1).padStart(2, '0')} / {card.tag}
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .studio {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(5rem, 10vw, 8rem);
+  }
+  .cards {
+    display: grid;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 900px) {
+    .cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .card {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    min-height: clamp(26rem, 42vw, 34rem);
+    padding: clamp(1.75rem, 3vw, 2.5rem);
+    padding-bottom: 6rem;
+    overflow: hidden;
+    border-radius: 1.8rem;
+    background: var(--ink-2);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  h3 {
+    display: grid;
+    margin-bottom: 0.6rem;
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(1.6rem, 2.6vw, 2.3rem);
+    line-height: 1;
+  }
+  .card p {
+    max-width: 30ch;
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  /* Círculo oliva que se sale de la placa, como en las destacadas */
+  .circle {
+    position: absolute;
+    right: -18%;
+    bottom: -32%;
+    z-index: -1;
+    width: 75%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #a9ac83, var(--olive) 55%, #7d805a);
+    box-shadow: 0 0 80px rgba(150, 153, 110, 0.35);
+    transition: transform 0.9s var(--ease);
+  }
+  /* Franja de vidrio sobre el círculo: se ve esmerilado detrás */
+  .frost {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    height: 4.5rem;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .tag {
+    position: absolute;
+    left: clamp(1.75rem, 3vw, 2.5rem);
+    bottom: 1.6rem;
+    z-index: 1;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .card:hover .circle {
+      transform: translate(-6%, -8%) scale(1.06);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .circle {
+      transition: none;
+    }
+  }
+</style>

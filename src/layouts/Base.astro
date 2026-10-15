@@ -20,7 +20,7 @@ const ogImage = new URL('/og.jpg', Astro.site ?? Astro.url).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#e9e9e9" />
+    <meta name="theme-color" content="#0d0d0d" />
     <script is:inline>document.documentElement.classList.add('js');</script>
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -36,6 +36,11 @@ const ogImage = new URL('/og.jpg', Astro.site ?? Astro.url).href;
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
     <slot />
+
+    <!-- Desenfoque progresivo en los bordes de la pantalla y grano fino global -->
+    <div class="edge-blur edge-blur--top" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="edge-blur edge-blur--bottom" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="grain" aria-hidden="true"></div>
 
     <script>
       import Lenis from 'lenis';
@@ -53,6 +58,16 @@ const ogImage = new URL('/og.jpg', Astro.site ?? Astro.url).href;
         document.addEventListener('lenis:stop', () => lenis.stop());
         document.addEventListener('lenis:start', () => lenis.start());
       }
+
+      // Estado del scroll para los desenfoques de borde: activos solo entre el hero y el final
+      const root = document.documentElement;
+      const onScroll = () => {
+        const y = window.scrollY;
+        root.classList.toggle('is-scrolled', y > window.innerHeight * 0.6);
+        root.classList.toggle('at-end', y + window.innerHeight > document.body.scrollHeight - 120);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
 
       // Aparición de elementos al entrar en pantalla
       const io = new IntersectionObserver(

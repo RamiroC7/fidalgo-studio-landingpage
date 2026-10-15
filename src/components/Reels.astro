@@ -1,335 +1,277 @@
 ---
 import { reels, contact } from '../data/site';
 import Icon from './Icon.astro';
+import SectionHead from './SectionHead.astro';
 ---
 
-<section class="section theme-dark reels" id="reels">
+<section class="reels" id="reels">
+  <div class="ambient" style="--gx: 15%; --gy: 55%" aria-hidden="true"></div>
+
   <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2 class="display" data-reveal>
-          <span class="line-mask"><span>Reels.</span></span>
-        </h2>
-      </div>
-      <div class="head-side reveal">
-        <p>Tocá un reel para verlo con sonido.</p>
-        <a class="ig-link" href={contact.instagramUrl} target="_blank" rel="noopener">
-          Más en Instagram <strong>{contact.instagram}</strong> <Icon name="arrow-up-right" />
-        </a>
-        <div class="arrows">
-          <button data-scroll="-1" aria-label="Reels anteriores" disabled><Icon name="arrow-left" /></button>
-          <button data-scroll="1" aria-label="Reels siguientes"><Icon name="arrow-right" /></button>
-        </div>
+    <SectionHead index="02" title="Reels" on="Idea, guion, rodaje y edición." off="Piezas pensadas para cada plataforma." />
+    <div class="controls reveal">
+      <span class="hint">Tocá un reel para verlo con sonido</span>
+      <div class="arrows">
+        <button class="arrow-btn" data-scroll="-1" aria-label="Reels anteriores"><Icon name="arrow-left" /></button>
+        <button class="arrow-btn" data-scroll="1" aria-label="Reels siguientes"><Icon name="arrow-right" /></button>
       </div>
     </div>
   </div>
 
-  <!-- Móvil: tira deslizable. Escritorio: grilla escalonada (ver estilos) -->
-  <ul class="strip" data-lenis-prevent-wheel>
+  <ul class="strip" data-strip data-lenis-prevent-wheel>
     {
       reels.map((r, i) => (
-        <li class="item reveal" style={`--d: ${Math.min(i, 4) * 0.06}s; --i: ${i}`}>
-          <button class="card" data-reel={r.slug} aria-label={`Ver reel de ${r.client} con sonido`}>
-            <video
-              src={`/media/reels/${r.slug}-preview.mp4`}
-              poster={`/media/reels/${r.slug}.webp`}
-              muted
-              loop
-              playsinline
-              preload="none"
-              data-autoplay
-            />
-            <span class="play" aria-hidden="true">
-              <Icon name="play" />
+        <li class="reveal" style={`--d: ${Math.min(i, 4) * 0.07}s`}>
+          <button class="phone-btn" data-reel={r.slug} aria-label={`Ver reel de ${r.client} con sonido`}>
+            <!-- Mockup de celular -->
+            <span class="phone">
+              <span class="island" aria-hidden="true" />
+              <video
+                src={`/media/reels/${r.slug}-preview.mp4`}
+                poster={`/media/reels/${r.slug}.webp`}
+                muted
+                loop
+                playsinline
+                preload="none"
+                data-autoplay
+              />
+              <span class="play glass" aria-hidden="true">
+                <Icon name="play" />
+              </span>
+            </span>
+            <span class="info">
+              <span class="num">({String(i + 1).padStart(2, '0')})</span>
+              <span class="client">{r.client}</span>
+              <span class="tag">{r.tag}</span>
             </span>
           </button>
-          <span class="caption">
-            <strong>{r.client}</strong>
-            <span>{r.tag}</span>
-          </span>
         </li>
       ))
     }
-    <li class="item more">
-      <a href={contact.instagramUrl} target="_blank" rel="noopener">
-        <span>Más en Instagram</span>
+    <li class="more-item">
+      <a class="more glass" href={contact.instagramUrl} target="_blank" rel="noopener">
+        <span class="em-off">Más trabajos en</span>
         <strong>{contact.instagram}</strong>
-        <span class="arrow">
-          <Icon name="arrow-up-right" />
-        </span>
+        <Icon name="arrow-up-right" class="more-arrow" />
       </a>
     </li>
   </ul>
 
   <dialog class="player" aria-label="Reproductor de reel">
     <form method="dialog">
-      <button class="p-close">Cerrar <Icon name="close" /></button>
+      <button class="pill p-close">Cerrar <Icon name="close" /></button>
     </form>
-    <video controls playsinline></video>
+    <span class="phone phone--big">
+      <span class="island" aria-hidden="true"></span>
+      <video controls playsinline></video>
+    </span>
   </dialog>
 </section>
 
 <style>
-  .reels p {
-    color: rgba(255, 255, 255, 0.75);
+  .reels {
+    position: relative;
+    isolation: isolate;
+    padding-block: clamp(5rem, 10vw, 8rem);
   }
-  .ig-link {
-    display: none;
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: -1.5rem 0 2rem;
   }
-  @media (min-width: 900px) {
-    .head-side {
-      justify-self: end;
-      max-width: 30ch;
-      text-align: right;
-    }
-    .head-side .ig-link {
-      justify-content: flex-end;
-      width: 100%;
-    }
+  .hint {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
   }
   .arrows {
     display: none;
     gap: 0.5rem;
-    margin-top: 1.4rem;
-    justify-content: flex-end;
   }
-  .arrows button {
+  .arrow-btn {
     display: grid;
     place-items: center;
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
-    border: 1px solid var(--line-dark);
-    font-size: 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     transition:
       background-color 0.2s ease,
       color 0.2s ease,
-      border-color 0.2s ease,
-      opacity 0.2s ease,
       transform 0.16s var(--ease);
   }
-  .arrows button:active:not(:disabled) {
+  .arrow-btn:active {
     transform: var(--press);
   }
-  .arrows button:disabled {
-    opacity: 0.3;
-    cursor: default;
+  @media (min-width: 900px) {
+    .arrows {
+      display: flex;
+    }
   }
   @media (hover: hover) and (pointer: fine) {
-    .arrows button:hover:not(:disabled) {
+    .arrow-btn:hover {
       background: var(--olive);
-      color: var(--ink);
       border-color: var(--olive);
+      color: var(--ink);
     }
   }
 
-  /* ---------- Móvil: tira deslizable ---------- */
+  /* Tira deslizable */
   .strip {
     display: flex;
-    gap: 1rem;
+    gap: clamp(1rem, 2vw, 1.75rem);
+    margin: 0;
+    padding: 1rem var(--gutter) 2rem;
+    list-style: none;
     overflow-x: auto;
-    overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: var(--gutter);
-    padding: 0 var(--gutter) 1.5rem;
-    margin: 0;
-    list-style: none;
-    scrollbar-width: thin;
-    scrollbar-color: var(--olive) transparent;
+    scrollbar-width: none;
   }
-  .item {
-    flex: 0 0 clamp(200px, 60vw, 260px);
+  .strip::-webkit-scrollbar {
+    display: none;
+  }
+  .strip > li {
+    flex: 0 0 clamp(210px, 19vw, 270px);
     scroll-snap-align: start;
-    display: grid;
-    gap: 0.75rem;
   }
-  .card {
+
+  .phone-btn {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    text-align: left;
+  }
+
+  /* Mockup: cuerpo negro con borde fino, isla y pantalla redondeada */
+  .phone {
     position: relative;
     display: block;
-    width: 100%;
-    aspect-ratio: 9 / 16;
-    border-radius: 0.9rem;
-    overflow: hidden;
-    background: var(--ink-2);
-    transition: transform 0.16s var(--ease);
+    aspect-ratio: 9 / 19.5;
+    padding: 7px;
+    border-radius: 2.4rem;
+    background: linear-gradient(150deg, #2a2a2a, #0f0f0f 45%, #1d1d1d);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 30px 60px -25px rgba(0, 0, 0, 0.9),
+      0 0 40px -10px rgba(150, 153, 110, 0.15);
+    transition: transform 0.6s var(--ease);
   }
-  .card:active {
-    transform: scale(0.98);
-  }
-  .card video {
+  .phone video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.6s var(--ease);
+    border-radius: 1.95rem;
+    background: var(--ink-2);
   }
-  .card:focus-visible {
-    outline-color: var(--olive);
-    outline-offset: 4px;
-  }
-  /* Pie de cada reel: cliente y tipo, debajo del video (no encima, así el video se ve completo) */
-  .caption {
-    display: grid;
-    gap: 0.15rem;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
-  }
-  .caption strong {
-    font-family: var(--font-display);
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 1rem;
-    line-height: 1.1;
-    color: var(--white);
-    overflow-wrap: anywhere;
+  .island {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    z-index: 2;
+    width: 30%;
+    height: 18px;
+    border-radius: 999px;
+    background: #000;
+    transform: translateX(-50%);
   }
   .play {
     position: absolute;
     top: 50%;
     left: 50%;
-    z-index: 1;
+    z-index: 2;
     display: grid;
     place-items: center;
-    width: 3.4rem;
-    height: 3.4rem;
-    margin: -1.7rem 0 0 -1.7rem;
-    padding-left: 0.15rem;
+    width: 3.6rem;
+    height: 3.6rem;
     border-radius: 50%;
-    background: var(--olive);
-    color: var(--ink);
     font-size: 1.2rem;
-    opacity: 0.92;
-    scale: 0.9;
+    translate: -50% -50%;
+    opacity: 0;
+    scale: 0.85;
     transition:
-      opacity 0.2s ease,
-      scale 0.3s var(--ease);
+      opacity 0.3s ease,
+      scale 0.4s var(--ease);
   }
-  .card:focus-visible .play {
-    opacity: 1;
-    scale: 1;
+
+  .info {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.1rem 0.6rem;
+    padding-inline: 0.3rem;
   }
-  /* En celular no hay hover: el play queda visible, un poco más chico */
-  @media (hover: none) {
-    .play {
-      scale: 0.8;
+  .num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--olive);
+    font-variant-numeric: tabular-nums;
+  }
+  .client {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1rem;
+    line-height: 1.1;
+  }
+  .tag {
+    grid-column: 2;
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .phone-btn:active .phone {
+    transform: scale(0.98);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .phone-btn:hover .phone {
+      transform: translateY(-8px) rotate(-1.5deg);
+    }
+    .phone-btn:hover .play {
+      opacity: 1;
+      scale: 1;
     }
   }
-  /* Mismo borde superior y mismo alto que los reels: arranca en la línea de los videos */
-  .more {
-    align-self: start;
+
+  /* Tarjeta final: más en Instagram */
+  .more-item {
+    display: flex;
   }
-  .more a {
-    position: relative;
+  .more {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     gap: 0.3rem;
     width: 100%;
-    aspect-ratio: 9 / 16;
-    padding: 1.2rem;
-    border-radius: 0.9rem;
-    background: var(--olive);
-    color: var(--ink);
-    transition:
-      background-color 0.2s ease,
-      transform 0.16s var(--ease);
-  }
-  .more a:active {
-    transform: scale(0.98);
+    aspect-ratio: 9 / 19.5;
+    padding: 1.6rem;
+    border-radius: 2.4rem;
+    transition: background-color 0.3s ease;
   }
   .more strong {
     font-family: var(--font-display);
-    font-size: 1.3rem;
+    font-size: 1.35rem;
     font-weight: 800;
-    overflow-wrap: anywhere;
   }
-  .more .arrow {
-    position: absolute;
-    top: 1.2rem;
-    right: 1.2rem;
+  .more :global(.more-arrow) {
     font-size: 1.8rem;
-    line-height: 1;
-    transition: transform 0.3s var(--ease);
+    margin-top: 0.6rem;
+    color: var(--olive);
+    transition: transform 0.4s var(--ease);
   }
   @media (hover: hover) and (pointer: fine) {
-    .card:hover video {
-      transform: scale(1.04);
-    }
-    .card:hover .play {
-      opacity: 1;
-      scale: 1;
-    }
-    .more a:hover {
-      background: var(--olive-light);
-    }
-    .more a:hover .arrow {
+    .more:hover :global(.more-arrow) {
       transform: translate(4px, -4px);
     }
   }
 
-  /* ---------- Escritorio: grilla escalonada ----------
-     Cinco columnas; las filas pares se corren hacia abajo, como si los reels estuvieran
-     colgados a distinta altura. Sin tira, sin flechas: se ve todo el catálogo de una. */
-  @media (min-width: 900px) {
-    .arrows {
-      display: none;
-    }
-    .strip {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 2.5rem clamp(1rem, 2vw, 2rem);
-      overflow: visible;
-      padding: 0 var(--gutter) 0;
-      scroll-snap-type: none;
-    }
-    .item {
-      flex: none;
-      width: auto;
-      translate: 0 0;
-    }
-    .item:nth-child(even) {
-      translate: 0 3.5rem;
-    }
-    .card {
-      transition: transform 0.16s var(--ease);
-    }
-  }
-  @media (min-width: 900px) and (max-width: 1199px) {
-    .strip {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-    .item:nth-child(even) {
-      translate: 0 0;
-    }
-    .item:nth-child(3n + 2) {
-      translate: 0 3rem;
-    }
-  }
-  @media (min-width: 900px) {
-    /* Fila de la derecha: el "más" siempre queda alineado, sin desfase */
-    /* En escritorio el "más" sale de la grilla (quedaba solo en la última fila) y va como link junto al título */
-    .more {
-      display: none;
-    }
-    .ig-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4em;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.85);
-      transition: color 0.2s ease;
-    }
-    .ig-link strong {
-      color: var(--white);
-      font-weight: 700;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .ig-link:hover {
-        color: var(--olive);
-      }
-    }
-  }
-
+  /* Reproductor con sonido */
   .player {
     padding: 0;
     border: 0;
@@ -337,78 +279,52 @@ import Icon from './Icon.astro';
     max-width: none;
     max-height: none;
     overflow: visible;
+    color: var(--white);
   }
   .player[open] {
     display: grid;
-    gap: 0.8rem;
-    justify-items: end;
-    animation: player-in 0.3s var(--ease);
+    gap: 1rem;
+    justify-items: center;
+    animation: pop 0.4s var(--ease);
   }
   .player::backdrop {
-    background: rgba(13, 13, 13, 0.92);
-    backdrop-filter: blur(6px);
+    background: rgba(13, 13, 13, 0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
   }
-  .player video {
-    height: min(82dvh, 160vw);
+  .phone--big {
+    height: min(80dvh, 150vw);
     width: auto;
-    aspect-ratio: 9 / 16;
-    border-radius: 1rem;
-    background: #000;
   }
-  .p-close {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    min-height: 2.75rem;
-    padding-inline: 0.5rem;
-    margin-right: -0.5rem;
-    color: var(--white);
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  @keyframes player-in {
+  @keyframes pop {
     from {
       opacity: 0;
-      transform: scale(0.96);
+      transform: translateY(16px) scale(0.98);
     }
   }
   @media (prefers-reduced-motion: reduce) {
     .player[open] {
       animation: none;
     }
-    .item:nth-child(even),
-    .item:nth-child(3n + 2) {
-      translate: 0 0;
+    .phone,
+    .play {
+      transition: none;
     }
   }
 </style>
 
 <script>
-  const strip = document.querySelector<HTMLUListElement>('.strip')!;
-  const arrows = document.querySelectorAll<HTMLButtonElement>('[data-scroll]');
-  arrows.forEach((b) =>
+  const strip = document.querySelector<HTMLUListElement>('[data-strip]')!;
+  document.querySelectorAll<HTMLButtonElement>('[data-scroll]').forEach((b) =>
     b.addEventListener('click', () => {
-      strip.scrollBy({ left: Number(b.dataset.scroll) * strip.clientWidth * 0.8, behavior: 'smooth' });
+      strip.scrollBy({ left: Number(b.dataset.scroll) * strip.clientWidth * 0.75, behavior: 'smooth' });
     }),
   );
-  // Las flechas se deshabilitan al llegar a cada punta de la tira (solo móvil)
-  const updateArrows = () => {
-    const max = strip.scrollWidth - strip.clientWidth - 2;
-    arrows[0].disabled = strip.scrollLeft <= 2;
-    arrows[1].disabled = strip.scrollLeft >= max;
-  };
-  strip.addEventListener('scroll', updateArrows, { passive: true });
-  window.addEventListener('resize', updateArrows);
-  updateArrows();
 
   const player = document.querySelector<HTMLDialogElement>('.player')!;
   const video = player.querySelector('video')!;
-  let opener: HTMLElement | null = null;
   document.querySelectorAll<HTMLButtonElement>('[data-reel]').forEach((card) => {
     card.addEventListener('click', () => {
-      opener = card;
       video.src = `/media/reels/${card.dataset.reel}.mp4`;
       video.poster = `/media/reels/${card.dataset.reel}.webp`;
       player.showModal();
@@ -421,8 +337,7 @@ import Icon from './Icon.astro';
     video.removeAttribute('src');
     video.load();
     document.dispatchEvent(new Event('lenis:start'));
-    opener?.focus();
   });
-  // Click fuera del video cierra
+  // Click fuera del celular cierra
   player.addEventListener('click', (e) => e.target === player && player.close());
 </script>

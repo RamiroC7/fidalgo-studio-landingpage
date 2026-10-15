@@ -1,220 +1,315 @@
 ---
-import { services } from '../data/site';
+import { services, contact } from '../data/site';
+import SectionHead from './SectionHead.astro';
+import Icon from './Icon.astro';
 
-// Iconos de línea con el mismo trazo que el hero y "Sobre mí" (viewBox 60×60 aprox.)
-const icons = [
-  // Creación de contenido: lamparita (ideas)
-  `<path d="M30 8 C15 8 8 20 8 32 C8 45 18 51 20 62 H40 C42 51 52 45 52 32 C52 20 45 8 30 8 Z"/><path d="M21 70 H39 M22 78 H38"/>`,
-  // Fotografía + video: cámara de cine
-  `<rect x="4" y="16" width="36" height="26" rx="3"/><path d="M40 22 L54 16 V36 L40 30 Z"/><path d="M14 42 L8 56 M14 42 L24 56 M14 42 V56"/>`,
-  // Edición audiovisual: claqueta
-  `<rect x="4" y="22" width="52" height="34" rx="2"/><path d="M4 30 H56"/><path d="M4 22 L10 12 H56 L50 22"/>`,
-  // Estrategia de contenido: calendario con planificación
-  `<rect x="6" y="12" width="48" height="44" rx="4"/><path d="M6 24 H54 M18 6 V16 M42 6 V16"/><path d="M16 36 H24 M30 36 H38 M16 46 H24"/>`,
-  // Gestión de redes: burbuja de chat con micrófono (conversación)
-  `<path d="M8 10 H52 Q56 10 56 14 V40 Q56 44 52 44 H28 L16 54 V44 H8 Q4 44 4 40 V14 Q4 10 8 10 Z"/><path d="M22 22 H38 M22 30 H32"/>`,
-];
-const drawable = (svg: string) => svg.replace(/<(path|rect|circle)\b/g, '<$1 pathLength="1"');
-// Variante de color por tarjeta: la marca alterna oliva, negro, papel y blanco
-// Fila 1: oliva + negro. Fila 2: papel, negro y oliva. Ningún negro queda pegado a otro.
-const tones = ['olive', 'ink', 'paper', 'ink', 'olive'];
+const direct = services.map((s, i) => ({ ...s, n: i + 1 })).filter((s) => !s.collab);
+const collab = services.map((s, i) => ({ ...s, n: i + 1 })).filter((s) => s.collab);
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<section class="section services" id="servicios">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2 class="display" data-reveal>
-          <span class="line-mask"><span>Qué</span></span>
-          <span class="line-mask"><span style="--d: 0.08s">hago.</span></span>
-        </h2>
-      </div>
-      <p class="reveal">Servicios desarrollados desde Fidalgo Studio para marcas, proyectos y emprendimientos.</p>
-    </div>
+<section class="services" id="servicios">
+  <div class="ambient" style="--gx: 20%; --gy: 20%" aria-hidden="true"></div>
 
-    <ul class="bento">
+  <div class="wrap">
+    <SectionHead index="04" title="Servicios" on="Contenido. Foto. Video. Estrategia." off="Soluciones creativas pensadas según lo que realmente necesita cada proyecto." />
+
+    <!-- Servicio directo: lista editorial -->
+    <p class="group-label reveal">Servicio directo</p>
+    <ol class="list">
       {
-        services.map((s, i) => (
-          <li class:list={['card', `card--${tones[i]}`, `card--${i + 1}`, 'reveal']} style={`--d: ${i * 0.08}s`}>
-            <span class="ico" aria-hidden="true">
-              <svg viewBox="0 0 60 84" set:html={drawable(icons[i])} />
-            </span>
+        direct.map((s) => (
+          <li class="row reveal">
+            <span class="n">({pad(s.n)})</span>
             <h3>{s.title}</h3>
-            <p>{s.text}</p>
-            <ul class="chips">
-              {s.tags.split(' · ').map((t) => (
+            <p class="text">{s.text}</p>
+            <ul class="tags">
+              {s.tags.map((t) => (
                 <li>{t}</li>
               ))}
             </ul>
           </li>
         ))
       }
-    </ul>
+    </ol>
+
+    <!-- En colaboración: encuadre técnico + franja de luz -->
+    <div class="collab reveal">
+      <span class="streak" aria-hidden="true"></span>
+      <span class="corner tl" aria-hidden="true"></span><span class="corner tr" aria-hidden="true"></span>
+      <span class="corner bl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span>
+
+      <div class="collab-head">
+        <p class="group-label">En colaboración con especialistas</p>
+        <h3 class="collab-title">
+          <span class="em-on">Más áreas.</span>
+          <span class="em-off">Un mismo punto de contacto.</span>
+        </h3>
+        <img class="mark" src="/brand/isotipo-white.png" alt="" width="205" height="240" />
+      </div>
+
+      <ul class="collab-cards">
+        {
+          collab.map((s) => (
+            <li class="ccard glass">
+              <span class="n">({pad(s.n)})</span>
+              <h4>{s.title}</h4>
+              <p>{s.text}</p>
+              <p class="ctags">{s.tags.join(' · ')}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="collab-foot">
+        <p class="em-off">
+          Todos los proyectos se coordinan a través de Fidalgo Studio. Armamos el equipo según lo que realmente necesite tu
+          proyecto.
+        </p>
+        <a class="pill" href={contact.whatsappUrl('Hola Tomás! Quiero consultar por un proyecto integral.')} target="_blank" rel="noopener">
+          Consultar <Icon name="arrow-right" />
+        </a>
+      </div>
+    </div>
   </div>
 </section>
 
 <style>
-  /* Bento: 6 columnas en escritorio. Tarjetas de distinto tamaño y color de marca. */
-  .bento {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
+  .services {
+    position: relative;
+    isolation: isolate;
+    /* La franja de luz se extiende más allá de los bordes: se recorta para no ensanchar la página */
+    overflow-x: clip;
+    padding-block: clamp(5rem, 10vw, 8rem);
+  }
+  .group-label {
+    margin-bottom: 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--olive);
+  }
+
+  /* ---------- Lista editorial ---------- */
+  .list {
+    margin: 0 0 clamp(4rem, 8vw, 6rem);
     padding: 0;
-    margin: 0;
     list-style: none;
   }
-  .card {
+  .row {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
-    min-height: 15rem;
-    padding: clamp(1.4rem, 2.6vw, 2rem);
-    border-radius: 1.25rem;
-    overflow: hidden;
-    transition:
-      transform 0.2s var(--ease),
-      background-color 0.3s ease,
-      color 0.3s ease;
-  }
-  .card:active {
-    transform: var(--press);
-  }
-  .card--olive {
-    background: var(--olive);
-    color: var(--ink);
-  }
-  .card--ink {
-    background: var(--ink);
-    color: var(--white);
-  }
-  .card--paper {
-    background: var(--paper);
-    color: var(--ink);
-  }
-  .card--white {
-    background: var(--white);
-    color: var(--ink);
-    box-shadow: inset 0 0 0 1px var(--line-light);
-  }
-
-  /* Icono en una forma redondeada: se dibuja al entrar en pantalla */
-  .ico {
     display: grid;
-    place-items: center;
-    width: 4.2rem;
-    height: 4.2rem;
-    border-radius: 50%;
-    background: rgba(13, 13, 13, 0.12);
-    margin-bottom: auto;
+    gap: 0.6rem 2rem;
+    padding: clamp(1.5rem, 2.5vw, 2rem) 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
-  .card--ink .ico {
-    background: rgba(150, 153, 110, 0.2);
+  .row:last-child {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
-  .ico svg {
-    width: 2.2rem;
-    height: auto;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    overflow: visible;
-    transition: transform 0.5s var(--ease);
+  /* Franja de luz oliva que aparece detrás de la fila al pasar */
+  .row::before {
+    content: '';
+    position: absolute;
+    inset: 15% -2%;
+    z-index: -1;
+    background: radial-gradient(50% 50% at 30% 50%, rgba(150, 153, 110, 0.28), transparent 70%);
+    filter: blur(24px);
+    opacity: 0;
+    transition: opacity 0.5s ease;
   }
-  :global(.js) .ico path,
-  :global(.js) .ico rect {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    transition: stroke-dashoffset 1.2s var(--ease-in-out);
-    transition-delay: calc(0.3s + var(--d, 0s));
+  .n {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--olive);
+    font-variant-numeric: tabular-nums;
   }
-  :global(.js) .card.is-in .ico path,
-  :global(.js) .card.is-in .ico rect {
-    stroke-dashoffset: 0;
-  }
-
-  h3 {
+  .row h3 {
     font-family: var(--font-display);
     font-weight: 800;
     text-transform: uppercase;
-    font-size: clamp(1.3rem, 2vw, 1.8rem);
-    line-height: 1.02;
-    max-width: 16ch;
+    font-size: clamp(1.5rem, 3vw, 2.6rem);
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.85);
+    transition:
+      color 0.3s ease,
+      transform 0.5s var(--ease);
   }
-  p {
-    font-size: 0.95rem;
+  .text {
+    max-width: 44ch;
+    font-size: 0.98rem;
     line-height: 1.5;
-    max-width: 38ch;
-    opacity: 0.85;
+    color: rgba(255, 255, 255, 0.6);
   }
-  /* Etiquetas como chips chiquitos, en vez de una línea de texto gris */
-  .chips {
+  .tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.4rem;
-    margin: auto 0 0;
+    margin: 0;
     padding: 0;
     list-style: none;
   }
-  .chips li {
-    padding: 0.3em 0.75em;
+  .tags li {
+    padding: 0.35em 0.85em;
     border-radius: 999px;
-    border: 1px solid currentColor;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  @media (min-width: 1000px) {
+    .row {
+      grid-template-columns: 4rem minmax(0, 1.2fr) minmax(0, 1fr);
+      align-items: start;
+    }
+    .tags {
+      grid-column: 3;
+    }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .row:hover::before {
+      opacity: 1;
+    }
+    .row:hover h3 {
+      color: var(--white);
+      transform: translateX(0.5rem);
+    }
+  }
+
+  /* ---------- En colaboración: encuadre técnico ---------- */
+  .collab {
+    position: relative;
+    isolation: isolate;
+    padding: clamp(2rem, 5vw, 4rem);
+  }
+  .corner {
+    position: absolute;
+    width: clamp(1.5rem, 3vw, 2.5rem);
+    aspect-ratio: 1;
+    border: 0 solid var(--olive);
+  }
+  .tl {
+    top: 0;
+    left: 0;
+    border-width: 1.5px 0 0 1.5px;
+    border-top-left-radius: 0.6rem;
+  }
+  .tr {
+    top: 0;
+    right: 0;
+    border-width: 1.5px 1.5px 0 0;
+    border-top-right-radius: 0.6rem;
+  }
+  .bl {
+    bottom: 0;
+    left: 0;
+    border-width: 0 0 1.5px 1.5px;
+    border-bottom-left-radius: 0.6rem;
+  }
+  .br {
+    bottom: 0;
+    right: 0;
+    border-width: 0 1.5px 1.5px 0;
+    border-bottom-right-radius: 0.6rem;
+  }
+  /* Franja de luz horizontal con blur direccional */
+  .streak {
+    position: absolute;
+    left: -10%;
+    right: -10%;
+    top: 38%;
+    z-index: -1;
+    height: 26%;
+    background:
+      linear-gradient(90deg, transparent, rgba(150, 153, 110, 0.55) 20%, rgba(150, 153, 110, 0.15) 50%, rgba(150, 153, 110, 0.55) 80%, transparent);
+    filter: blur(40px);
     opacity: 0.8;
   }
 
+  .collab-head {
+    position: relative;
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+  }
+  .collab-title {
+    display: grid;
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(1.8rem, 4.5vw, 3.8rem);
+    line-height: 0.98;
+  }
+  /* Micro-branding: el isotipo como firma, no como protagonista */
+  .mark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: auto;
+    height: 2.2rem;
+    opacity: 0.8;
+  }
+
+  .collab-cards {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 900px) {
+    .collab-cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .ccard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding: 1.6rem;
+    border-radius: 1.4rem;
+    transition:
+      border-color 0.3s ease,
+      transform 0.5s var(--ease);
+  }
+  .ccard h4 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+    line-height: 1.02;
+  }
+  .ccard p {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .ccard .ctags {
+    margin-top: auto;
+    padding-top: 0.6rem;
+    font-size: 0.78rem;
+    color: var(--olive);
+  }
   @media (hover: hover) and (pointer: fine) {
-    .card:hover .ico svg {
-      transform: translateY(-3px) rotate(-4deg);
-    }
-    .card--olive:hover {
-      background: var(--olive-light);
-    }
-    .card--paper:hover {
-      background: var(--white);
-    }
-    .card--white:hover {
-      box-shadow: inset 0 0 0 1px var(--ink);
+    .ccard:hover {
+      border-color: rgba(150, 153, 110, 0.6);
+      transform: translateY(-4px);
     }
   }
 
-  @media (min-width: 700px) {
-    .bento {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .collab-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem 2rem;
+    margin-top: clamp(2rem, 4vw, 2.75rem);
   }
-  @media (min-width: 1000px) {
-    .bento {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-    /* Fila 1: dos tarjetas grandes. Fila 2: tres medianas. */
-    .card--1,
-    .card--2 {
-      grid-column: span 3;
-      min-height: 22rem;
-    }
-    .card--3,
-    .card--4,
-    .card--5 {
-      grid-column: span 2;
-    }
-    .card--1 {
-      grid-row: span 1;
-    }
+  .collab-foot p {
+    max-width: 52ch;
+    font-size: 0.92rem;
   }
-
   @media (prefers-reduced-motion: reduce) {
-    :global(.js) .ico path,
-    :global(.js) .ico rect {
-      stroke-dashoffset: 0;
-      transition: none;
-    }
-    .card,
-    .ico svg {
+    .row h3,
+    .ccard {
       transition: none;
     }
   }

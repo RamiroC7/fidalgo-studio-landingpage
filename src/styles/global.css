@@ -59,13 +59,13 @@ html {
   scroll-padding-top: 5rem;
   accent-color: var(--olive);
   caret-color: var(--olive);
-  scrollbar-color: var(--gray) var(--white);
+  scrollbar-color: #3a3a3a var(--ink);
 }
 
 body {
   margin: 0;
-  background: var(--white);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.55;
@@ -269,19 +269,211 @@ p {
   }
 }
 
+/* ---------- Lenguaje visual (dirección de destacadas) ---------- */
+
+/* Índice de sección entre paréntesis: (01), (02)… */
+.index {
+  display: block;
+  margin-bottom: 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--olive);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Título de sección grande */
+.h-section {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(2.8rem, 9vw, 8rem);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+}
+
+/* Fade typography: el texto pasa de blanco a gris */
+.fade-text {
+  background: linear-gradient(90deg, var(--white) 35%, rgba(255, 255, 255, 0.32));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Selective emphasis: palabras en blanco y el resto en gris */
+.em-on {
+  color: var(--white);
+}
+.em-off {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Vidrio esmerilado (glassmorphism sutil) */
+.glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+
+/* Luz ambiental oliva (se posiciona con --gx / --gy) */
+.ambient {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(40% 35% at var(--gx, 20%) var(--gy, 30%), rgba(150, 153, 110, 0.18), transparent 70%);
+  filter: blur(30px);
+}
+
+/* Botón de vidrio tipo píldora */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--white);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.16s var(--ease);
+}
+.pill:active {
+  transform: var(--press);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pill:hover {
+    background: var(--olive);
+    border-color: var(--olive);
+    color: var(--ink);
+  }
+}
+
+/* Desenfoque progresivo en los bordes de la pantalla: el contenido entra y sale desenfocado */
+.edge-blur {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  height: clamp(4rem, 9vh, 6.5rem);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+/* Solo mientras se recorre la página: arriba de todo y al final no tapa el pie del hero ni el footer */
+.is-scrolled:not(.at-end) .edge-blur--bottom,
+.is-scrolled .edge-blur--top {
+  opacity: 1;
+}
+.edge-blur--top {
+  top: 0;
+}
+.edge-blur--bottom {
+  bottom: 0;
+}
+.edge-blur > span {
+  position: absolute;
+  inset: 0;
+}
+.edge-blur--bottom > span:nth-child(1) {
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  mask: linear-gradient(to bottom, transparent 0%, #000 35%);
+  -webkit-mask: linear-gradient(to bottom, transparent 0%, #000 35%);
+}
+.edge-blur--bottom > span:nth-child(2) {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  mask: linear-gradient(to bottom, transparent 30%, #000 65%);
+  -webkit-mask: linear-gradient(to bottom, transparent 30%, #000 65%);
+}
+.edge-blur--bottom > span:nth-child(3) {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  mask: linear-gradient(to bottom, transparent 60%, #000 100%);
+  -webkit-mask: linear-gradient(to bottom, transparent 60%, #000 100%);
+}
+.edge-blur--top > span:nth-child(1) {
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  mask: linear-gradient(to top, transparent 0%, #000 35%);
+  -webkit-mask: linear-gradient(to top, transparent 0%, #000 35%);
+}
+.edge-blur--top > span:nth-child(2) {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  mask: linear-gradient(to top, transparent 30%, #000 65%);
+  -webkit-mask: linear-gradient(to top, transparent 30%, #000 65%);
+}
+.edge-blur--top > span:nth-child(3) {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  mask: linear-gradient(to top, transparent 60%, #000 100%);
+  -webkit-mask: linear-gradient(to top, transparent 60%, #000 100%);
+}
+
+/* Grano fino sobre todo el sitio para que el negro no se vea plano */
+/* El contenedor ocupa la pantalla y recorta; la textura (más grande, para moverse) va en ::before */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  overflow: hidden;
+  pointer-events: none;
+}
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation: grain 0.9s steps(4) infinite;
+}
+@keyframes grain {
+  25% {
+    transform: translate(-3%, 2%);
+  }
+  50% {
+    transform: translate(2%, -3%);
+  }
+  75% {
+    transform: translate(-2%, -1%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain::before {
+    animation: none;
+  }
+}
+
 /* ---------- Animaciones al scrollear ---------- */
-/* Solo se ocultan si hay JS (clase .js en <html>); sin JS el contenido queda visible. */
+/* Solo se ocultan si hay JS (clase .js en <html>); sin JS el contenido queda visible.
+   Entran desenfocadas y se enfocan (progressive type blur). */
 
 .js .reveal {
   opacity: 0;
+  filter: blur(10px);
   transform: translateY(20px);
   transition:
-    opacity 0.8s var(--ease),
-    transform 0.8s var(--ease);
+    opacity 0.9s var(--ease),
+    filter 1s var(--ease),
+    transform 0.9s var(--ease);
   transition-delay: var(--d, 0s);
 }
 .js .reveal.is-in {
   opacity: 1;
+  filter: none;
   transform: none;
 }
 
@@ -310,6 +502,7 @@ p {
   /* Sin desplazamientos: solo un fundido corto para no perder el cambio de estado */
   .js .reveal {
     transform: none;
+    filter: none;
     transition: opacity 0.4s ease;
   }
   .js .line-mask > span {
