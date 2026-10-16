@@ -5,8 +5,8 @@ import Icon from './Icon.astro';
 
 <!--
   Hero: fondo oscuro con grano y luz ambiental oliva.
-  El logo funciona como ventana: las letras están rellenas con video y el final de la palabra
-  se desenfoca de a poco (progressive blur). Alrededor, un encuadre de visor de cámara.
+  El logo funciona como ventana: las letras están rellenas con video.
+  Alrededor, un encuadre de visor de cámara.
 -->
 <section class="hero" id="top">
   <div class="glow" aria-hidden="true"></div>
@@ -36,10 +36,6 @@ import Icon from './Icon.astro';
             preload="auto"
             data-hero-video></video>
         </span>
-        <!-- Capas de desenfoque progresivo sobre el final de la palabra -->
-        <span class="blur b1"></span>
-        <span class="blur b2"></span>
-        <span class="blur b3"></span>
       </span>
     </h1>
 
@@ -147,6 +143,16 @@ import Icon from './Icon.astro';
     background: var(--olive);
     box-shadow: 0 0 10px var(--olive);
     animation: blink 1.6s steps(2, jump-none) infinite;
+    transition:
+      background-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  /* Al pasar el mouse por el logo, la cámara "graba de verdad": el punto se pone rojo */
+  @media (hover: hover) and (pointer: fine) {
+    .hero:has(.wordmark:hover) .rec i {
+      background: #e5332a;
+      box-shadow: 0 0 12px #e5332a;
+    }
   }
   @keyframes blink {
     50% {
@@ -187,31 +193,6 @@ import Icon from './Icon.astro';
     object-fit: cover;
     /* Un poco más de luz para que las letras se lean sobre el negro */
     filter: brightness(1.35) contrast(1.05) saturate(0.85);
-  }
-
-  /* Desenfoque progresivo: tres capas con más blur cuanto más a la derecha */
-  .blur {
-    position: absolute;
-    inset: -12% -4% -12% 0;
-    pointer-events: none;
-  }
-  .b1 {
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    -webkit-mask: linear-gradient(90deg, transparent 56%, #000 66%);
-    mask: linear-gradient(90deg, transparent 56%, #000 66%);
-  }
-  .b2 {
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    -webkit-mask: linear-gradient(90deg, transparent 66%, #000 78%);
-    mask: linear-gradient(90deg, transparent 66%, #000 78%);
-  }
-  .b3 {
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    -webkit-mask: linear-gradient(90deg, transparent 78%, #000 92%);
-    mask: linear-gradient(90deg, transparent 78%, #000 92%);
   }
 
   /* Frase: algunas palabras en blanco, el resto en gris (selective emphasis) */
@@ -317,31 +298,14 @@ import Icon from './Icon.astro';
     opacity: 1;
   }
 
-  /* Con la barra en dos filas (logo + links) el encuadre arranca más abajo */
-  @media (max-width: 999px) {
-    .frame {
-      margin-top: 7.5rem;
-    }
-  }
-
   /* ---------- Celular ---------- */
   @media (max-width: 699px) {
     .frame {
-      margin: 7.25rem 0.75rem 0;
+      margin: 5.25rem 0.75rem 0;
       padding-inline: 0;
     }
-    /* Un poco de margen para que el desenfoque de la "o" no toque el borde */
     .title {
       width: 94%;
-    }
-    /* En pantallas chicas el desenfoque es más suave para que "go" se siga leyendo */
-    .b2 {
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
-    }
-    .b3 {
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
     }
     .foot {
       grid-template-columns: 1fr auto;

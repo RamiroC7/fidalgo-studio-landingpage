@@ -35,9 +35,6 @@ import SectionHead from './SectionHead.astro';
                 preload="none"
                 data-autoplay
               />
-              <span class="play glass" aria-hidden="true">
-                <Icon name="play" />
-              </span>
             </span>
             <span class="info">
               <span class="num">({String(i + 1).padStart(2, '0')})</span>
@@ -182,24 +179,6 @@ import SectionHead from './SectionHead.astro';
     background: #000;
     transform: translateX(-50%);
   }
-  .play {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 2;
-    display: grid;
-    place-items: center;
-    width: 3.6rem;
-    height: 3.6rem;
-    border-radius: 50%;
-    font-size: 1.2rem;
-    translate: -50% -50%;
-    opacity: 0;
-    scale: 0.85;
-    transition:
-      opacity 0.3s ease,
-      scale 0.4s var(--ease);
-  }
 
   .info {
     display: grid;
@@ -228,14 +207,11 @@ import SectionHead from './SectionHead.astro';
 
   .phone-btn:active .phone {
     transform: scale(0.98);
+    transition-duration: 0.12s;
   }
   @media (hover: hover) and (pointer: fine) {
     .phone-btn:hover .phone {
       transform: translateY(-8px) rotate(-1.5deg);
-    }
-    .phone-btn:hover .play {
-      opacity: 1;
-      scale: 1;
     }
   }
 
@@ -280,34 +256,62 @@ import SectionHead from './SectionHead.astro';
     max-height: none;
     overflow: visible;
     color: var(--white);
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s var(--ease),
+      display 0.2s allow-discrete,
+      overlay 0.2s allow-discrete;
   }
   .player[open] {
     display: grid;
     gap: 1rem;
     justify-items: center;
-    animation: pop 0.4s var(--ease);
+    opacity: 1;
+    transform: none;
+    transition-duration: 0.4s;
+  }
+  @starting-style {
+    .player[open] {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
   }
   .player::backdrop {
     background: rgba(13, 13, 13, 0.75);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
+    opacity: 0;
+    transition:
+      opacity 0.2s ease,
+      display 0.2s allow-discrete,
+      overlay 0.2s allow-discrete;
+  }
+  .player[open]::backdrop {
+    opacity: 1;
+    transition-duration: 0.4s;
+  }
+  @starting-style {
+    .player[open]::backdrop {
+      opacity: 0;
+    }
   }
   .phone--big {
     height: min(80dvh, 150vw);
     width: auto;
   }
-  @keyframes pop {
-    from {
-      opacity: 0;
-      transform: translateY(16px) scale(0.98);
-    }
-  }
   @media (prefers-reduced-motion: reduce) {
+    .player,
     .player[open] {
-      animation: none;
+      transform: none;
     }
-    .phone,
-    .play {
+    @starting-style {
+      .player[open] {
+        transform: none;
+      }
+    }
+    .phone {
       transition: none;
     }
   }
@@ -334,9 +338,13 @@ import SectionHead from './SectionHead.astro';
   });
   player.addEventListener('close', () => {
     video.pause();
-    video.removeAttribute('src');
-    video.load();
     document.dispatchEvent(new Event('lenis:start'));
+    // Se descarga el video recién cuando terminó la animación de cierre
+    setTimeout(() => {
+      if (player.open) return;
+      video.removeAttribute('src');
+      video.load();
+    }, 250);
   });
   // Click fuera del celular cierra
   player.addEventListener('click', (e) => e.target === player && player.close());

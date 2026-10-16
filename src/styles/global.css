@@ -81,6 +81,14 @@ video {
   max-width: 100%;
 }
 
+/* Las fotos diferidas aparecen con un fundido cuando terminan de cargar */
+img[loading='lazy'] {
+  transition: opacity 0.4s var(--ease);
+}
+img.is-loading {
+  opacity: 0;
+}
+
 a {
   color: inherit;
   text-decoration: none;

@@ -3,15 +3,17 @@ import { nav, contact } from '../data/site';
 import Icon from './Icon.astro';
 ---
 
-<!-- Navbar con los links escritos (sin menú desplegable). Arriba de todo es transparente;
-     al scrollear toma un fondo de vidrio oscuro. El link de la sección visible queda resaltado. -->
+<!-- Navbar: arriba de todo ocupa el ancho y es transparente; al scrollear se encoge a una píldora flotante
+     de vidrio con el isotipo. Siempre visible. En celular los links pasan a un menú a pantalla completa. -->
 <header class="header">
   <div class="bar wrap">
     <a href="#top" class="logo" aria-label="Fidalgo Studio, volver arriba">
-      <img src="/brand/logo-white.png" alt="" width="1000" height="381" />
+      <img class="logo-full" src="/brand/logo-white.png" alt="" width="1000" height="381" />
+      <img class="logo-iso" src="/brand/isotipo-white.png" alt="" width="205" height="240" />
     </a>
 
     <nav class="links" aria-label="Secciones">
+      <span class="ind" aria-hidden="true"></span>
       {
         nav.map((item, i) => (
           <a href={item.href} data-nav={item.href.slice(1)}>
@@ -22,12 +24,54 @@ import Icon from './Icon.astro';
       }
     </nav>
 
-    <a class="cta" href={contact.whatsappUrl()} target="_blank" rel="noopener">
+    <a class="cta" href={contact.whatsappUrl()} target="_blank" rel="noopener" aria-label="Contame tu proyecto por WhatsApp">
       <span class="cta-long">Contame tu proyecto</span>
       <span class="cta-short">Escribime</span>
       <Icon name="arrow-up-right" />
     </a>
+
+    <button class="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu">
+      <span></span><span></span>
+    </button>
+
+    <!-- Progreso de lectura: la rayita se llena al bajar y una camarita de cine va filmando en la punta -->
+    <span class="track" aria-hidden="true">
+      <span class="line"></span>
+      <span class="head">
+        <svg class="cam" viewBox="0 0 22 16" width="22" height="16">
+          <g class="reel">
+            <circle cx="5.5" cy="4" r="3.2" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
+            <path d="M5.5 1.6v4.8M3.1 4h4.8" stroke="currentColor" stroke-width="1"></path>
+          </g>
+          <g class="reel">
+            <circle cx="12.5" cy="4" r="3.2" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
+            <path d="M12.5 1.6v4.8M10.1 4h4.8" stroke="currentColor" stroke-width="1"></path>
+          </g>
+          <rect x="1.5" y="7.6" width="13.5" height="7.4" rx="1.6" fill="currentColor"></rect>
+          <path d="M15.6 10.2 20.5 7.8v6.8l-4.9-2.4Z" fill="currentColor"></path>
+        </svg>
+      </span>
+    </span>
   </div>
+
+  <!-- Menú de celular: links grandes centrados sobre vidrio oscuro -->
+  <nav class="menu" id="menu" aria-label="Menú" inert>
+    <ul>
+      {
+        nav.map((item, i) => (
+          <li style={`--i: ${i}`}>
+            <a href={item.href} data-sec={item.href.slice(1)}>
+              <span class="n">{String(i + 1).padStart(2, '0')}</span>
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <a class="btn menu-cta" style={`--i: ${nav.length}`} href={contact.whatsappUrl()} target="_blank" rel="noopener">
+      Contame tu proyecto <Icon name="arrow-up-right" class="arrow" />
+    </a>
+  </nav>
 </header>
 
 <style>
@@ -37,42 +81,161 @@ import Icon from './Icon.astro';
     z-index: 50;
     overflow-x: clip;
     color: var(--white);
-    transition:
-      background-color 0.3s ease,
-      border-color 0.3s ease,
-      translate 0.45s var(--ease);
-    border-bottom: 1px solid transparent;
-  }
-  .header.scrolled {
-    background: rgba(13, 13, 13, 0.55);
-    border-bottom-color: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(18px) saturate(1.3);
-    -webkit-backdrop-filter: blur(18px) saturate(1.3);
-  }
-  .header.hide {
-    translate: 0 -100%;
-  }
-  .header.hide:focus-within {
-    translate: 0 0;
+    /* Los costados vacíos de la píldora no bloquean los clicks de la página */
+    pointer-events: none;
   }
 
   /* Logo | links | CTA */
   .bar {
+    --logo-h: 1.9rem;
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 1rem 2rem;
     min-height: 4.5rem;
+    position: relative;
+    max-width: min(var(--max), 100%);
+    margin-top: 0;
+    border: 1px solid transparent;
+    border-radius: 0;
+    pointer-events: auto;
+    /* Por encima del menú de celular, así el logo y la X quedan visibles con el menú abierto */
+    z-index: 1;
+    transition:
+      max-width 0.55s var(--ease),
+      margin-top 0.55s var(--ease),
+      padding 0.55s var(--ease),
+      min-height 0.55s var(--ease),
+      border-radius 0.55s var(--ease),
+      background-color 0.35s ease,
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+  /* Scrolleado: píldora flotante de vidrio, más angosta y centrada */
+  .scrolled .bar {
+    max-width: min(60rem, calc(100% - 2rem));
+    margin-top: 0.75rem;
+    min-height: 3.75rem;
+    padding-inline: 1.1rem 0.45rem;
+    border-radius: 999px;
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(22, 22, 22, 0.6);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    box-shadow:
+      0 16px 40px -16px rgba(0, 0, 0, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* Riel de la rayita: en la píldora se aleja de las puntas redondeadas para correr por el borde recto */
+  .track {
+    --inset: 0rem;
+    position: absolute;
+    left: var(--inset);
+    right: var(--inset);
+    bottom: -1px;
+    z-index: -1;
+    height: 2px;
+    pointer-events: none;
+    transition:
+      left 0.55s var(--ease),
+      right 0.55s var(--ease);
+  }
+  .scrolled .track {
+    --inset: 1.9rem;
+  }
+  .line {
+    position: absolute;
+    inset: 0;
+    background: var(--olive);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  /* Ocupa todo el riel: moverlo un X% deja la cámara justo en la punta de la rayita */
+  .head {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .scrolled .head {
+    opacity: 1;
+  }
+  /* La cámara va montada sobre la línea: el cuerpo queda centrado en ella y la rayita sale de atrás */
+  .cam {
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 1.15rem;
+    height: auto;
+    color: var(--olive);
+    translate: -30% -70%;
+    overflow: visible;
+  }
+  .reel {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* Logo completo arriba; en la píldora queda solo el isotipo */
+  .logo {
+    position: relative;
+    display: block;
+    width: calc(var(--logo-h) * 1000 / 381);
+    height: var(--logo-h);
+    transition: width 0.55s var(--ease);
   }
   .logo img {
-    height: 1.9rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
     width: auto;
+    transition:
+      opacity 0.3s ease,
+      scale 0.45s var(--ease);
+  }
+  .logo-iso {
+    opacity: 0;
+    scale: 0.7;
+  }
+  .scrolled .logo {
+    width: calc(var(--logo-h) * 205 / 240);
+  }
+  .scrolled .logo-full {
+    opacity: 0;
+    scale: 0.9;
+  }
+  .scrolled .logo-iso {
+    opacity: 1;
+    scale: 1;
   }
 
   .links {
+    position: relative;
     display: flex;
     justify-content: center;
     gap: 0.25rem;
+  }
+  /* Una sola burbuja que viaja hasta el link de la sección visible */
+  .ind {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      translate 0.3s var(--ease-in-out),
+      width 0.3s var(--ease-in-out),
+      opacity 0.2s ease;
+  }
+  .ind.on {
+    opacity: 1;
+  }
+  .ind.instant {
+    transition: opacity 0.2s ease;
   }
   .links a {
     position: relative;
@@ -99,10 +262,9 @@ import Icon from './Icon.astro';
     color: var(--olive);
     font-variant-numeric: tabular-nums;
   }
-  /* Sección visible: link en blanco con fondo de vidrio */
+  /* Sección visible: link en blanco (el fondo lo pone la burbuja .ind) */
   .links a.active {
     color: var(--white);
-    background: rgba(255, 255, 255, 0.08);
   }
   @media (hover: hover) and (pointer: fine) {
     .links a:hover {
@@ -140,37 +302,169 @@ import Icon from './Icon.astro';
     }
   }
 
-  /* Tablet y celular: logo + CTA arriba; los links abajo, en una fila que se desliza de costado */
+  /* ---------- Hamburguesa (solo celular): dos líneas que se cruzan en una X ---------- */
+  .burger {
+    position: relative;
+    display: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    transition:
+      transform 0.16s var(--ease),
+      background-color 0.2s ease;
+  }
+  .burger span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.05rem;
+    height: 1.5px;
+    margin: -0.75px 0 0 -0.525rem;
+    border-radius: 1px;
+    background: currentColor;
+    transition: transform 0.3s var(--ease-in-out);
+  }
+  .burger span:first-child {
+    transform: translateY(-3.5px);
+  }
+  .burger span:last-child {
+    transform: translateY(3.5px);
+  }
+  .menu-open .burger span:first-child {
+    transform: rotate(45deg);
+  }
+  .menu-open .burger span:last-child {
+    transform: rotate(-45deg);
+  }
+  .burger:active {
+    transform: var(--press);
+  }
+
+  /* ---------- Menú a pantalla completa (solo celular) ---------- */
+  .menu {
+    display: none;
+  }
+
+  /* Tablet y celular: logo | CTA | hamburguesa en un solo renglón */
   @media (max-width: 999px) {
     .bar {
-      grid-template-columns: minmax(0, 1fr) auto;
-      row-gap: 0;
-      padding-top: 0.6rem;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      column-gap: 0.5rem;
     }
     .links {
-      grid-column: 1 / -1;
-      grid-row: 2;
-      justify-content: flex-start;
-      min-width: 0;
-      padding: 0.25rem 0 0.5rem;
-      overflow-x: auto;
-      scrollbar-width: none;
-      /* Se desvanece a la derecha para indicar que hay más links */
-      mask: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
-      -webkit-mask: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
-    }
-    .links::-webkit-scrollbar {
       display: none;
     }
-    .links a {
-      padding: 0 0.8rem;
-      font-size: 0.72rem;
+    .burger {
+      display: block;
     }
-    .links a:first-child {
-      padding-left: 0;
+    .scrolled .bar {
+      max-width: calc(100% - 1.5rem);
+      min-height: 3.5rem;
+      padding: 0.35rem 0.35rem 0.35rem 1rem;
     }
-    .links a.active:first-child {
-      padding-left: 0.8rem;
+    .scrolled .track {
+      --inset: 1.75rem;
+    }
+
+    .menu {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 2.5rem;
+      padding: 6rem var(--gutter) 3rem;
+      overflow-y: auto;
+      background: rgba(13, 13, 13, 0.82);
+      backdrop-filter: blur(22px) saturate(1.2);
+      -webkit-backdrop-filter: blur(22px) saturate(1.2);
+      opacity: 0;
+      visibility: hidden;
+      /* Cierre más rápido que la apertura; visibility espera a que termine el fundido */
+      transition:
+        opacity 0.25s ease,
+        visibility 0s linear 0.25s;
+    }
+    .menu-open .menu {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition:
+        opacity 0.35s ease,
+        visibility 0s;
+    }
+    .menu ul {
+      display: grid;
+      gap: 0.5rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      text-align: center;
+    }
+    .menu ul a {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.3rem 0.5rem;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(2rem, 10vw, 3.2rem);
+      line-height: 1;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+      transition: color 0.2s ease;
+    }
+    .menu ul a.active {
+      color: var(--white);
+    }
+    .menu .n {
+      margin-top: 0.3em;
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+    }
+    /* Los links entran de a uno (desenfocados → nítidos); al cerrar se van todos juntos y rápido */
+    .menu li,
+    .menu-cta {
+      opacity: 0;
+      translate: 0 18px;
+      filter: blur(6px);
+      transition:
+        opacity 0.2s ease,
+        translate 0.2s var(--ease),
+        filter 0.2s ease,
+        transform 0.16s var(--ease);
+    }
+    .menu-open .menu li,
+    .menu-open .menu-cta {
+      opacity: 1;
+      translate: 0 0;
+      filter: none;
+      transition-duration: 0.5s, 0.5s, 0.5s, 0.16s;
+      transition-delay: calc(var(--i) * 55ms + 80ms), calc(var(--i) * 55ms + 80ms), calc(var(--i) * 55ms + 80ms), 0s;
+    }
+  }
+  @media (max-width: 999px) and (hover: hover) and (pointer: fine) {
+    .menu ul a:hover {
+      color: var(--white);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ind {
+      transition: opacity 0.2s ease;
+    }
+    .bar,
+    .logo,
+    .logo img {
+      transition: opacity 0.2s ease;
+    }
+    .menu li,
+    .menu-cta {
+      translate: none;
+      filter: none;
     }
   }
   @media (max-width: 479px) {
@@ -180,8 +474,8 @@ import Icon from './Icon.astro';
     .cta-short {
       display: inline;
     }
-    .logo img {
-      height: 1.6rem;
+    .bar {
+      --logo-h: 1.6rem;
     }
   }
 </style>
@@ -190,28 +484,74 @@ import Icon from './Icon.astro';
   const header = document.querySelector<HTMLElement>('.header')!;
   const links = [...header.querySelectorAll<HTMLAnchorElement>('[data-nav]')];
 
-  // Fondo de vidrio al scrollear; se esconde al bajar y reaparece al subir
-  let lastY = window.scrollY;
+  // Al bajar un poco la barra se encoge a píldora; arriba de todo vuelve a ocupar el ancho.
+  // La rayita marca cuánto se leyó y la cámara de la punta gira los rollos mientras se scrollea.
+  const line = header.querySelector<HTMLElement>('.line')!;
+  const head = header.querySelector<HTMLElement>('.head')!;
+  const reels = [...header.querySelectorAll<SVGGElement>('.reel')];
+  const spin = !matchMedia('(prefers-reduced-motion: reduce)').matches;
   const onScroll = () => {
     const y = window.scrollY;
     header.classList.toggle('scrolled', y > 40);
-    if (Math.abs(y - lastY) > 6) {
-      header.classList.toggle('hide', y > 500 && y > lastY);
-      lastY = y;
-    }
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const p = max > 0 ? Math.min(y / max, 1) : 0;
+    line.style.transform = `scaleX(${p})`;
+    head.style.transform = `translateX(${p * 100}%)`;
+    if (spin) reels.forEach((r) => (r.style.rotate = `${y / 4}deg`));
   };
   window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
   onScroll();
 
-  // Resalta el link de la sección que ocupa el centro de la pantalla
+  // Burbuja: se desliza entre links; si venía oculta, aparece directo en su lugar (sin viajar desde la izquierda)
+  const ind = header.querySelector<HTMLElement>('.ind')!;
+  let current: HTMLAnchorElement | undefined;
+  const placeInd = (snap = false) => {
+    if (!current) {
+      ind.classList.remove('on');
+      return;
+    }
+    const fromHidden = !ind.classList.contains('on');
+    snap ||= fromHidden;
+    ind.classList.toggle('instant', snap);
+    ind.style.translate = `${current.offsetLeft}px ${current.offsetTop}px`;
+    ind.style.width = `${current.offsetWidth}px`;
+    ind.style.height = `${current.offsetHeight}px`;
+    ind.classList.add('on');
+    if (snap) requestAnimationFrame(() => ind.classList.remove('instant'));
+  };
+  document.fonts.ready.then(() => placeInd(true));
+  // Mientras la barra cambia de tamaño (o la ventana), la burbuja acompaña al link sin retraso
+  new ResizeObserver(() => placeInd(true)).observe(ind.parentElement!);
+
+  // Menú de celular
+  const burger = header.querySelector<HTMLButtonElement>('.burger')!;
+  const menu = header.querySelector<HTMLElement>('.menu')!;
+  const menuLinks = [...menu.querySelectorAll<HTMLAnchorElement>('[data-sec]')];
+  const setMenu = (open: boolean) => {
+    if (open === header.classList.contains('menu-open')) return;
+    header.classList.toggle('menu-open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    menu.inert = !open;
+    // Sin scroll de fondo mientras está abierto (Lenis y nativo)
+    document.documentElement.style.overflow = open ? 'hidden' : '';
+    document.dispatchEvent(new Event(open ? 'lenis:stop' : 'lenis:start'));
+    if (!open && menu.contains(document.activeElement)) burger.focus();
+  };
+  burger.addEventListener('click', () => setMenu(!header.classList.contains('menu-open')));
+  // Tocar un link cierra el menú y deja que el ancla haga el scroll
+  menu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', (e) => e.key === 'Escape' && setMenu(false));
+  // Si la pantalla se agranda a escritorio con el menú abierto, se cierra
+  matchMedia('(min-width: 1000px)').addEventListener('change', (e) => e.matches && setMenu(false));
+
+  // Resalta el link de la sección que ocupa el centro de la pantalla (en la barra y en el menú)
   const setActive = (id: string | null) => {
     links.forEach((a) => a.classList.toggle('active', a.dataset.nav === id));
-    // En celular, centra el link activo dentro de la fila deslizable (sin mover la página)
-    const active = links.find((a) => a.dataset.nav === id);
-    const row = active?.parentElement;
-    if (active && row && row.scrollWidth > row.clientWidth) {
-      row.scrollTo({ left: active.offsetLeft - (row.clientWidth - active.offsetWidth) / 2, behavior: 'smooth' });
-    }
+    menuLinks.forEach((a) => a.classList.toggle('active', a.dataset.sec === id));
+    current = links.find((a) => a.dataset.nav === id);
+    placeInd();
   };
   const io = new IntersectionObserver(
     (entries) => {
