@@ -100,15 +100,5 @@ export const reels = [
   { slug: 'luna-andina', client: 'Luna Andina', tag: 'Video de joyería', file: '2025/LUNA ANDINA/Reel #1.mov' },
 ];
 
-// Montaje vertical para el hero: [archivo, segundo de inicio] → cortes de 2 s.
-export const heroCuts = [
-  ['2026/RICH/Reel Medallones.mp4', 6],
-  ['2026/HOLA MANOLA/Reel 20_5.mp4', 2],
-  ['2025/VINCENT MOTO GARAGE/Reel #2.mp4', 3],
-  ['2026/CREA BIJOU/Reel Fornitura.mov', 4],
-  ['2026/CATA MAJUL/Reel Imperial.mp4', 9],
-  ['2025/LUNA ANDINA/Reel #1.mov', 1],
-];
-
 // Video horizontal cinematográfico (Baum). Se recorta abajo para sacar los subtítulos quemados.
 export const showreel = { file: '2025/BAUM/Reel #2.mov', start: 2, duration: 20 };

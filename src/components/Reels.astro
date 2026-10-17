@@ -18,7 +18,7 @@ import SectionHead from './SectionHead.astro';
     </div>
   </div>
 
-  <ul class="strip" data-strip data-lenis-prevent-wheel>
+  <ul class="strip" data-strip data-lenis-prevent-horizontal>
     {
       reels.map((r, i) => (
         <li class="reveal" style={`--d: ${Math.min(i, 4) * 0.07}s`}>
@@ -210,7 +210,8 @@ import SectionHead from './SectionHead.astro';
     transition-duration: 0.12s;
   }
   @media (hover: hover) and (pointer: fine) {
-    .phone-btn:hover .phone {
+    /* Mientras se scrollea con la ruedita los celulares que pasan bajo el cursor no se mueven */
+    .strip:not(.is-wheeling) .phone-btn:hover .phone {
       transform: translateY(-8px) rotate(-1.5deg);
     }
   }
@@ -324,6 +325,12 @@ import SectionHead from './SectionHead.astro';
       strip.scrollBy({ left: Number(b.dataset.scroll) * strip.clientWidth * 0.75, behavior: 'smooth' });
     }),
   );
+  // Con la ruedita se apaga el movimiento al pasar por encima; vuelve cuando el mouse se mueve de verdad
+  // (al scrollear el navegador también avisa movimientos del mouse, pero sin desplazamiento)
+  strip.addEventListener('wheel', () => strip.classList.add('is-wheeling'), { passive: true });
+  strip.addEventListener('pointermove', (e) => {
+    if (e.movementX || e.movementY) strip.classList.remove('is-wheeling');
+  });
 
   const player = document.querySelector<HTMLDialogElement>('.player')!;
   const video = player.querySelector('video')!;
@@ -346,6 +353,8 @@ import SectionHead from './SectionHead.astro';
       video.load();
     }, 250);
   });
-  // Click fuera del celular cierra
-  player.addEventListener('click', (e) => e.target === player && player.close());
+  // Click fuera del celular cierra (solo si el click también empezó afuera: arrastrar la barra de progreso y soltar afuera no cierra)
+  let downOnPlayer = false;
+  player.addEventListener('pointerdown', (e) => (downOnPlayer = e.target === player));
+  player.addEventListener('click', (e) => e.target === player && downOnPlayer && player.close());
 </script>

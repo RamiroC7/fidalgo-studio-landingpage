@@ -490,17 +490,44 @@ import Icon from './Icon.astro';
   const head = header.querySelector<HTMLElement>('.head')!;
   const reels = [...header.querySelectorAll<SVGGElement>('.reel')];
   const spin = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const track = header.querySelector<HTMLElement>('.track')!;
+  const sections = links.map((a) => document.getElementById(a.dataset.nav!));
+  // Con los links visibles, la cámara llega debajo de cada uno justo cuando su sección se activa
+  // (su borde superior cruza la mitad de la pantalla) y viaja de un link al siguiente entre secciones.
+  // Sin links (celular) avanza en proporción a toda la página.
+  const progress = (y: number, max: number) => {
+    const t = track.getBoundingClientRect();
+    if (!links[0]?.offsetWidth || !t.width) return y / max;
+    const stops: [number, number][] = [[0, 0]];
+    links.forEach((a, i) => {
+      const s = sections[i];
+      if (!s) return;
+      const r = a.getBoundingClientRect();
+      const at = Math.min(Math.max(s.getBoundingClientRect().top + y - window.innerHeight / 2, 0), max);
+      stops.push([at, (r.left + r.width / 2 - t.left) / t.width]);
+    });
+    stops.push([max, 1]);
+    for (let i = 1; i < stops.length; i++) {
+      const [y0, p0] = stops[i - 1];
+      const [y1, p1] = stops[i];
+      if (y <= y1) return y1 > y0 ? p0 + ((y - y0) / (y1 - y0)) * (p1 - p0) : p1;
+    }
+    return 1;
+  };
   const onScroll = () => {
     const y = window.scrollY;
     header.classList.toggle('scrolled', y > 40);
     const max = document.documentElement.scrollHeight - window.innerHeight;
-    const p = max > 0 ? Math.min(y / max, 1) : 0;
+    const p = max > 0 ? Math.min(Math.max(progress(y, max), 0), 1) : 0;
     line.style.transform = `scaleX(${p})`;
     head.style.transform = `translateX(${p * 100}%)`;
     if (spin) reels.forEach((r) => (r.style.rotate = `${y / 4}deg`));
   };
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
+  // La píldora cambia de ancho con una transición: al terminar, la cámara se reubica sobre los links
+  track.addEventListener('transitionend', onScroll);
+  document.fonts.ready.then(onScroll);
   onScroll();
 
   // Burbuja: se desliza entre links; si venía oculta, aparece directo en su lugar (sin viajar desde la izquierda)
@@ -528,12 +555,15 @@ import Icon from './Icon.astro';
   const burger = header.querySelector<HTMLButtonElement>('.burger')!;
   const menu = header.querySelector<HTMLElement>('.menu')!;
   const menuLinks = [...menu.querySelectorAll<HTMLAnchorElement>('[data-sec]')];
+  // El resto de la página queda inerte con el menú abierto: el foco del teclado no se escapa detrás
+  const behind = [...document.querySelectorAll<HTMLElement>('main, .fab')];
   const setMenu = (open: boolean) => {
     if (open === header.classList.contains('menu-open')) return;
     header.classList.toggle('menu-open', open);
     burger.setAttribute('aria-expanded', String(open));
     burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
     menu.inert = !open;
+    behind.forEach((el) => (el.inert = open));
     // Sin scroll de fondo mientras está abierto (Lenis y nativo)
     document.documentElement.style.overflow = open ? 'hidden' : '';
     document.dispatchEvent(new Event(open ? 'lenis:stop' : 'lenis:start'));

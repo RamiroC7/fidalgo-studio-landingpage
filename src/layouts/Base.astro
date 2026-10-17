@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import JsonLd from '../components/JsonLd.astro';
 
 interface Props {
   title?: string;
@@ -7,10 +8,13 @@ interface Props {
 }
 
 const {
-  title = 'Fidalgo Studio — Contenido, foto, video y estrategia',
-  description = 'Estudio creativo de Tomás Fidalgo enfocado en contenido, producción audiovisual y comunicación visual para marcas, proyectos y emprendimientos.',
+  title = 'Fidalgo Studio | Fotografía, video y contenido en Tucumán',
+  description = 'Estudio creativo de Tomás Fidalgo en Tucumán: creación de contenido, fotografía, video, edición y estrategia para marcas, proyectos y emprendimientos.',
 } = Astro.props;
-const ogImage = new URL('/og.jpg', Astro.site ?? Astro.url).href;
+const site = Astro.site ?? new URL(Astro.url.origin);
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL('/og-fidalgo-studio.jpg', site).href;
+const ogAlt = 'Fidalgo Studio, estudio creativo de contenido, foto y video';
 ---
 
 <!doctype html>
@@ -20,18 +24,38 @@ const ogImage = new URL('/og.jpg', Astro.site ?? Astro.url).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content="Tomás Fidalgo" />
+    <meta name="geo.region" content="AR-T" />
+    <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#0d0d0d" />
+    <meta name="color-scheme" content="dark" />
     <script is:inline>document.documentElement.classList.add('js');</script>
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preload" href="/fonts/PPNeueMachina-Ultrabold.otf" as="font" type="font/otf" crossorigin />
+    <link rel="preload" href="/media/showreel.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="/fonts/PPNeueMachina-Ultrabold.woff2" as="font" type="font/woff2" crossorigin />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Fidalgo Studio" />
     <meta property="og:locale" content="es_AR" />
+    <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:secure_url" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogAlt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogAlt} />
+    <JsonLd />
   </head>
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>

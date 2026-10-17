@@ -5,6 +5,12 @@ import Icon from './Icon.astro';
 
 const direct = services.map((s, i) => ({ ...s, n: i + 1 })).filter((s) => !s.collab);
 const collab = services.map((s, i) => ({ ...s, n: i + 1 })).filter((s) => s.collab);
+// Cómo trabajamos con la red de especialistas: [parte destacada, resto]
+const flow = [
+  ['Nos contás', 'qué necesita tu proyecto.'],
+  ['Sumamos al especialista', 'indicado para cada área.'],
+  ['Coordinamos todo', 'hasta la entrega, con un solo contacto.'],
+];
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
@@ -12,7 +18,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
   <div class="ambient" style="--gx: 20%; --gy: 20%" aria-hidden="true"></div>
 
   <div class="wrap">
-    <SectionHead index="04" title="Servicios" on="Contenido. Foto. Video. Estrategia." off="Soluciones creativas pensadas según lo que realmente necesita cada proyecto." />
+    <SectionHead index="04" title="Servicios" />
 
     <!-- Servicio directo: lista editorial -->
     <p class="group-label reveal">Servicio directo</p>
@@ -40,7 +46,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
       <span class="corner bl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span>
 
       <div class="collab-head">
-        <p class="group-label">En colaboración con especialistas</p>
+        <p class="group-label">Red de especialistas</p>
         <h3 class="collab-title">
           <span class="em-on">Más áreas.</span>
           <span class="em-off">Un mismo punto de contacto.</span>
@@ -48,14 +54,30 @@ const pad = (n: number) => String(n).padStart(2, '0');
         <img class="mark" src="/brand/isotipo-white.png" alt="" width="205" height="240" />
       </div>
 
+      <!-- Cómo funciona: el estudio es el nexo entre la marca y cada especialista -->
+      <ol class="flow">
+        {
+          flow.map((step, i) => (
+            <li>
+              <span class="flow-n">Paso {i + 1}</span>
+              <p>
+                <span class="em-on">{step[0]}</span> <span class="em-off">{step[1]}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+
       <ul class="collab-cards">
         {
           collab.map((s) => (
             <li class="ccard glass">
-              <span class="n">({pad(s.n)})</span>
+              <span class="ctop">
+                <span class="n">({pad(s.n)})</span>
+                <span class="badge">Especialista asociado</span>
+              </span>
               <h4>{s.title}</h4>
               <p>{s.text}</p>
-              <p class="ctags">{s.tags.join(' · ')}</p>
             </li>
           ))
         }
@@ -63,8 +85,8 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
       <div class="collab-foot">
         <p class="em-off">
-          Todos los proyectos se coordinan a través de Fidalgo Studio. Armamos el equipo según lo que realmente necesite tu
-          proyecto.
+          Un solo contacto para todo: Fidalgo Studio. Elegimos a cada especialista según lo que realmente necesite tu proyecto
+          y seguimos el trabajo de punta a punta.
         </p>
         <a class="pill" href={contact.whatsappUrl('Hola Tomás! Quiero consultar por un proyecto integral.')} target="_blank" rel="noopener">
           Consultar <Icon name="arrow-right" />
@@ -248,6 +270,37 @@ const pad = (n: number) => String(n).padStart(2, '0');
     opacity: 0.8;
   }
 
+  /* Pasos: rayita oliva arriba de cada uno, como un recorrido */
+  .flow {
+    display: grid;
+    gap: 1rem clamp(1.5rem, 3vw, 2.5rem);
+    margin: 0 0 clamp(2rem, 4vw, 2.75rem);
+    padding: 0;
+    list-style: none;
+  }
+  .flow li {
+    display: grid;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(150, 153, 110, 0.45);
+  }
+  .flow-n {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--olive);
+  }
+  .flow p {
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+  @media (min-width: 900px) {
+    .flow {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
   .collab-cards {
     display: grid;
     gap: 1rem;
@@ -270,6 +323,23 @@ const pad = (n: number) => String(n).padStart(2, '0');
       border-color 0.3s ease,
       transform 0.5s var(--ease);
   }
+  .ctop {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .badge {
+    padding: 0.3em 0.75em;
+    border-radius: 999px;
+    border: 1px solid rgba(150, 153, 110, 0.45);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--olive-light);
+  }
   .ccard h4 {
     font-family: var(--font-display);
     font-weight: 800;
@@ -281,12 +351,6 @@ const pad = (n: number) => String(n).padStart(2, '0');
     font-size: 0.92rem;
     line-height: 1.5;
     color: rgba(255, 255, 255, 0.7);
-  }
-  .ccard .ctags {
-    margin-top: auto;
-    padding-top: 0.6rem;
-    font-size: 0.78rem;
-    color: var(--olive);
   }
   @media (hover: hover) and (pointer: fine) {
     .ccard:hover {

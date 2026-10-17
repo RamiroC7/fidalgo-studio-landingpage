@@ -27,13 +27,13 @@ import Icon from './Icon.astro';
         <span class="ghost"></span>
         <span class="fill">
           <video
-            src="/media/showreel.mp4"
+            data-src="/media/showreel.mp4"
             poster="/media/showreel.webp"
             autoplay
             muted
             loop
             playsinline
-            preload="auto"
+            preload="none"
             data-hero-video></video>
         </span>
       </span>
@@ -342,9 +342,17 @@ import Icon from './Icon.astro';
   // Entrada: el logo aparece desenfocado y se enfoca
   requestAnimationFrame(() => hero.classList.add('is-in'));
 
-  if (reduceMotion) {
-    video.removeAttribute('autoplay');
-    video.pause();
+  // El video pesa: se pide recién cuando terminó de cargar el resto de la página.
+  // Mientras tanto se ve el póster, que es su primer cuadro. Con menos movimiento queda solo el póster.
+  // El autoplay nativo arranca solo cuando la pestaña está visible (aunque se haya abierto en segundo plano)
+  let inView: boolean | undefined;
+  const loadVideo = () => {
+    if (inView === false) video.autoplay = false;
+    video.src = video.dataset.src!;
+  };
+  if (!reduceMotion) {
+    if (document.readyState === 'complete') loadVideo();
+    else window.addEventListener('load', loadVideo, { once: true });
   }
 
   // Contador tipo cámara (hh:mm:ss:frames) que corre desde que se abrió la página
@@ -359,8 +367,9 @@ import Icon from './Icon.astro';
 
   // Video y contador solo corren mientras el hero está en pantalla
   new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
     if (entry.isIntersecting) {
-      if (!reduceMotion) video.play().catch(() => {});
+      if (video.src) video.play().catch(() => {});
       raf = requestAnimationFrame(tick);
     } else {
       video.pause();

@@ -48,7 +48,7 @@ export const studio: { tag: string; title: [string, string]; lines: Segment[][] 
     tag: 'Manifiesto',
     title: ['Más que', 'crear contenido,'],
     lines: [
-      [['buscamos comunicar, conectar', false], ['y reflejar la esencia de cada marca.', true]],
+      [['Buscamos comunicar, conectar', false], ['y reflejar la esencia de cada marca.', true]],
       [['Construimos identidades visuales', false], ['con algo para decir.', true]],
     ],
   },

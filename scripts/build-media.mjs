@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import heicConvert from 'heic-convert';
 import ffmpeg from 'ffmpeg-static';
-import { projects, reels, heroCuts, showreel } from './media.config.mjs';
+import { projects, reels, showreel } from './media.config.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ASSETS = process.env.FIDALGO_ASSETS ?? path.resolve(ROOT, '../fidalgo-studio-assets/LANDING PAGE @fidalgostudio');
@@ -58,11 +58,11 @@ for (const r of reels) {
   const preview = path.join(reelDir, `${r.slug}-preview.mp4`);
   const poster = path.join(reelDir, `${r.slug}.webp`);
   if (!skip(full)) {
-    ff(['-i', src, '-vf', vertical, '-c:v', 'libx264', '-preset', 'slow', '-crf', '28', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart', full]);
+    ff(['-i', src, '-vf', vertical, '-c:v', 'libx264', '-preset', 'slow', '-crf', '30', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart', full]);
     console.log('reel', r.slug);
   }
   if (!skip(preview)) {
-    ff(['-ss', '1', '-t', '8', '-i', src, '-vf', 'scale=480:854:force_original_aspect_ratio=increase,crop=480:854,setsar=1', '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', '30', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', preview]);
+    ff(['-ss', '1', '-t', '8', '-i', src, '-vf', 'scale=480:854:force_original_aspect_ratio=increase,crop=480:854,setsar=1,fps=30', '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', '30', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', preview]);
   }
   if (!skip(poster)) {
     const frame = path.join(reelDir, `${r.slug}.tmp.png`);
@@ -72,23 +72,10 @@ for (const r of reels) {
   }
 }
 
-// Hero: montaje vertical de cortes de 2 s, mudo, en loop.
-const hero = path.join(VIDEO_OUT, 'hero.mp4');
-if (!skip(hero)) {
-  const inputs = heroCuts.flatMap(([file, ss]) => ['-ss', String(ss), '-t', '2', '-i', path.join(SRC, file)]);
-  const chains = heroCuts.map((_, i) => `[${i}:v]scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280,setsar=1,fps=30[v${i}]`).join(';');
-  const concat = heroCuts.map((_, i) => `[v${i}]`).join('') + `concat=n=${heroCuts.length}:v=1:a=0[out]`;
-  ff([...inputs, '-filter_complex', `${chains};${concat}`, '-map', '[out]', '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', '29', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', hero]);
-  ff(['-ss', '0.5', '-i', hero, '-frames:v', '1', path.join(VIDEO_OUT, 'hero.tmp.png')]);
-  await sharp(path.join(VIDEO_OUT, 'hero.tmp.png')).webp({ quality: 72 }).toFile(path.join(VIDEO_OUT, 'hero.webp'));
-  fs.rmSync(path.join(VIDEO_OUT, 'hero.tmp.png'));
-  console.log('hero');
-}
-
 // Showreel horizontal (Baum): se recorta el 12 % inferior para sacar los subtítulos quemados.
 const reel = path.join(VIDEO_OUT, 'showreel.mp4');
 if (!skip(reel)) {
-  ff(['-ss', String(showreel.start), '-t', String(showreel.duration), '-i', path.join(SRC, showreel.file), '-vf', 'crop=iw:ih*0.88:0:0,scale=1600:-2,setsar=1', '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', '28', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', reel]);
+  ff(['-ss', String(showreel.start), '-t', String(showreel.duration), '-i', path.join(SRC, showreel.file), '-vf', 'crop=iw:ih*0.88:0:0,scale=1600:-2,setsar=1', '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', '32', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', reel]);
   ff(['-ss', '1', '-i', reel, '-frames:v', '1', path.join(VIDEO_OUT, 'showreel.tmp.png')]);
   await sharp(path.join(VIDEO_OUT, 'showreel.tmp.png')).webp({ quality: 72 }).toFile(path.join(VIDEO_OUT, 'showreel.webp'));
   fs.rmSync(path.join(VIDEO_OUT, 'showreel.tmp.png'));

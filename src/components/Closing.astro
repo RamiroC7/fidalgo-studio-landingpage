@@ -7,7 +7,6 @@ const year = new Date().getFullYear();
 const credits = [
   { role: 'Producción', names: ['Fidalgo Studio'] },
   { role: 'Contenido · Foto · Video · Edición', names: ['Tomás Fidalgo'] },
-  { role: 'Con', names: clients },
   { role: 'En colaboración con', names: ['Diseño + identidad', 'Publicidad digital', 'Web + software'] },
 ];
 ---
@@ -23,21 +22,46 @@ const credits = [
       </h2>
     </div>
 
-    <p class="stat reveal">
-      <span class="stat-num" data-count={clients.length}>{clients.length}</span>
-      <span class="stat-label">marcas confiaron en el estudio</span>
-    </p>
+    <!-- Ficha técnica: el número grande a un lado y los créditos en filas al otro -->
+    <div class="sheet">
+      <p class="stat reveal">
+        <span class="stat-num" data-count={clients.length}>{clients.length}</span>
+        <span class="stat-label">marcas confían en el estudio</span>
+      </p>
 
-    <dl class="credits">
-      {
-        credits.map((c, i) => (
-          <div class="credit reveal" style={`--d: ${i * 0.08}s`}>
-            <dt>{c.role}</dt>
-            <dd>{c.names.join(' · ')}</dd>
-          </div>
-        ))
-      }
-    </dl>
+      <dl class="credits">
+        {
+          credits.map((c, i) => (
+            <div class="credit reveal" style={`--d: ${i * 0.08}s`}>
+              <dt>{c.role}</dt>
+              <dd>{c.names.join(' · ')}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+
+    <!-- Marcas: índice numerado, como la lista de créditos; el último casillero invita a sumarse -->
+    <div class="brands">
+      <p class="brands-label reveal">Con</p>
+      <ol class="brands-grid">
+        {
+          clients.map((c, i) => (
+            <li class="brand-item reveal" style={`--d: ${(i % 3) * 0.06}s`}>
+              <span class="brand-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="brand-name">{c}</span>
+            </li>
+          ))
+        }
+        <li class="brand-item brand-next reveal" style={`--d: ${(clients.length % 3) * 0.06}s`}>
+          <a href={contact.whatsappUrl()} target="_blank" rel="noopener" aria-label="Sumá tu marca: escribime por WhatsApp">
+            <span class="brand-num">{String(clients.length + 1).padStart(2, '0')}</span>
+            <span class="brand-name">Tu marca</span>
+            <Icon name="arrow-up-right" class="brand-arrow" />
+          </a>
+        </li>
+      </ol>
+    </div>
 
     <div class="cta reveal">
       <p>
@@ -49,22 +73,43 @@ const credits = [
       </a>
     </div>
 
-    <!-- Contacto chico, al pie -->
+    <!-- Pie: marca a la izquierda, contacto a la derecha, créditos legales abajo -->
     <footer class="foot">
-      <ul class="channels">
-        <li>
-          <a href={contact.whatsappUrl()} target="_blank" rel="noopener">WhatsApp {contact.whatsappDisplay}</a>
-        </li>
-        <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
-        <li>
-          <a href={contact.instagramUrl} target="_blank" rel="noopener">{contact.instagram}</a>
-        </li>
-      </ul>
+      <div class="foot-main">
+        <div class="brand">
+          <a href="#top" class="brand-logo" aria-label="Fidalgo Studio, volver arriba">
+            <img src="/brand/logo-white.png" alt="Fidalgo Studio" width="1000" height="381" loading="lazy" />
+          </a>
+          <p>Contenido, foto, video y estrategia para marcas que quieren verse como son.</p>
+        </div>
+        <ul class="channels">
+          <li>
+            <a href={contact.whatsappUrl()} target="_blank" rel="noopener">
+              <span class="ch-label">WhatsApp</span>
+              <span class="ch-value">{contact.whatsappDisplay}</span>
+              <Icon name="arrow-up-right" class="ch-arrow" />
+            </a>
+          </li>
+          <li>
+            <a href={`mailto:${contact.email}?subject=${encodeURIComponent('Consulta desde la web')}`} data-email={contact.email}>
+              <span class="ch-label">Email</span>
+              <span class="ch-value" aria-live="polite">{contact.email}</span>
+              <Icon name="arrow-up-right" class="ch-arrow" />
+            </a>
+          </li>
+          <li>
+            <a href={contact.instagramUrl} target="_blank" rel="noopener">
+              <span class="ch-label">Instagram</span>
+              <span class="ch-value">{contact.instagram}</span>
+              <Icon name="arrow-up-right" class="ch-arrow" />
+            </a>
+          </li>
+        </ul>
+      </div>
       <div class="legal">
-        <img src="/brand/logo-white.png" alt="Fidalgo Studio" width="1000" height="381" loading="lazy" />
         <span>© {year} Fidalgo Studio</span>
         <span>
-          Desarrollado por <a class="kei" href="https://keisoftware.dev" target="_blank" rel="noopener">KEI Software</a>
+          Desarrollado por <a class="kei" href="https://keisoftware.dev" target="_blank" rel="noopener"><img src="/brand/kei-software.png" alt="" width="88" height="128" loading="lazy" />KEI Software</a>
         </span>
       </div>
     </footer>
@@ -102,134 +147,348 @@ const credits = [
     line-height: 0.95;
   }
 
+  /* ---------- Ficha técnica ---------- */
+  .sheet {
+    display: grid;
+    grid-template-columns: minmax(0, 0.6fr) minmax(0, 1.4fr);
+    align-items: end;
+    gap: 2.5rem clamp(2rem, 6vw, 6rem);
+    margin-top: clamp(4rem, 8vw, 6rem);
+    text-align: left;
+  }
+  /* El número y su texto quedan centrados entre sí; el bloque se apoya a la izquierda */
   .stat {
     display: grid;
+    justify-self: start;
     justify-items: center;
-    gap: 0.4rem;
-    margin-top: clamp(3rem, 6vw, 4.5rem);
+    gap: 0.8rem;
   }
   .stat-num {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: clamp(3rem, 8vw, 5.5rem);
-    line-height: 1;
+    font-size: clamp(5.5rem, 14vw, 11rem);
+    line-height: 0.82;
+    letter-spacing: -0.02em;
     color: var(--olive);
     font-variant-numeric: tabular-nums;
   }
   .stat-label {
+    white-space: nowrap;
     font-size: 0.8rem;
     font-weight: 600;
+    line-height: 1.5;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.6);
   }
 
-  /* Créditos: rol en gris, nombres en blanco, centrados como en el cierre de una película */
+  /* Créditos: rol en oliva a la izquierda, nombres a la derecha, filas separadas por una línea fina */
   .credits {
-    display: grid;
-    gap: 1.6rem;
-    max-width: 46rem;
-    margin: clamp(3rem, 6vw, 4.5rem) auto 0;
+    margin: 0;
+    border-top: 1px solid var(--line-dark);
   }
   .credit {
     display: grid;
-    gap: 0.35rem;
+    grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.4rem 1.5rem;
+    padding-block: 1.15rem;
+    border-bottom: 1px solid var(--line-dark);
   }
   dt {
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.6;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--olive);
+    text-wrap: balance;
+  }
+  dd {
+    margin: 0;
+    font-size: clamp(1rem, 1.4vw, 1.2rem);
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* ---------- Índice de marcas ---------- */
+  .brands {
+    margin-top: clamp(4rem, 8vw, 6rem);
+    text-align: left;
+  }
+  .brands-label {
+    margin-bottom: 1.2rem;
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--olive);
   }
-  dd {
+  .brands-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 4vw, 3.5rem);
     margin: 0;
-    font-size: clamp(0.98rem, 1.4vw, 1.15rem);
-    line-height: 1.6;
+    padding: 0;
+    list-style: none;
+  }
+  /* Línea abajo de cada marca y arriba de la primera fila: la grilla queda cerrada aunque la última fila esté incompleta */
+  .brand-item {
+    border-bottom: 1px solid var(--line-dark);
+  }
+  .brand-item:nth-child(-n + 3) {
+    border-top: 1px solid var(--line-dark);
+  }
+  .brand-item,
+  .brand-next a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: clamp(0.9rem, 1.6vw, 1.25rem);
+  }
+  .brand-next {
+    padding: 0;
+  }
+  .brand-next a {
+    flex: 1;
+  }
+  .brand-num {
+    flex: none;
+    width: 1.6rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--olive);
+    font-variant-numeric: tabular-nums;
+  }
+  .brand-name {
+    min-width: 0;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.05rem, 1.9vw, 1.6rem);
+    line-height: 1.1;
+    text-transform: uppercase;
     color: rgba(255, 255, 255, 0.85);
+    transition:
+      color 0.3s ease,
+      translate 0.4s var(--ease);
+  }
+  /* El casillero para sumarse va en oliva, con la flechita de los links */
+  .brand-next .brand-name {
+    color: var(--olive);
+  }
+  .brands :global(.brand-arrow) {
+    align-self: center;
+    margin-left: auto;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--olive);
+    transition: transform 0.35s var(--ease);
   }
 
+  /* ---------- Llamado final ---------- */
   .cta {
     display: grid;
-    justify-items: center;
-    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 2rem 3rem;
     margin-top: clamp(4rem, 8vw, 6rem);
+    text-align: left;
   }
   .cta p {
-    max-width: 34ch;
-    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
-    line-height: 1.4;
+    max-width: 24ch;
+    font-size: clamp(1.5rem, 3.2vw, 2.6rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
   }
 
   /* ---------- Pie ---------- */
   .foot {
     margin-top: clamp(5rem, 10vw, 8rem);
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: clamp(2.5rem, 5vw, 3.5rem);
+    border-top: 1px solid var(--line-dark);
+    text-align: left;
+  }
+  .foot-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    align-items: start;
+    gap: 2.5rem clamp(2rem, 8vw, 8rem);
+  }
+  .brand {
+    display: grid;
+    justify-items: start;
+    gap: 1.2rem;
+  }
+  .brand-logo {
+    display: inline-flex;
+    transition: opacity 0.25s ease;
+  }
+  .brand img {
+    height: 2.6rem;
+    width: auto;
+  }
+  .brand p {
+    max-width: 30ch;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.55);
   }
   .channels {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.25rem 2rem;
     margin: 0;
     padding: 0;
     list-style: none;
-    font-size: 0.88rem;
+    border-top: 1px solid var(--line-dark);
+  }
+  .channels li {
+    border-bottom: 1px solid var(--line-dark);
   }
   .channels a {
-    position: relative;
-    display: inline-block;
-    padding-block: 0.5rem;
-    color: rgba(255, 255, 255, 0.7);
-    transition: color 0.2s ease;
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 1.05rem;
+    color: rgba(255, 255, 255, 0.85);
+    transition: color 0.25s ease;
   }
-  /* Rayita que se dibuja desde la izquierda al entrar y se va hacia la derecha al salir */
-  .channels a::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0.3rem;
-    height: 1px;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.35s var(--ease);
+  .ch-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--olive);
+  }
+  .ch-value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  }
+  .channels :global(.ch-arrow) {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: rgba(255, 255, 255, 0.4);
+    transition:
+      transform 0.35s var(--ease),
+      color 0.25s ease;
   }
   .legal {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem 2rem;
-    margin-top: 1.5rem;
+    gap: 0.75rem 2rem;
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.45);
   }
-  .legal img {
-    height: 1.6rem;
+  .legal .kei img {
+    height: 1.05em;
     width: auto;
-    opacity: 0.8;
   }
   .kei {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    vertical-align: middle;
     font-weight: 700;
     color: #5b9cf6;
     transition: color 0.2s ease;
   }
   @media (hover: hover) and (pointer: fine) {
-    .channels a:hover {
-      color: var(--olive);
+    .brand-item:hover .brand-name {
+      color: var(--white);
+      translate: 4px 0;
     }
-    .channels a:hover::after {
-      transform: scaleX(1);
-      transform-origin: left;
+    .brand-next a:hover .brand-name {
+      color: var(--olive-light);
+    }
+    .brand-next a:hover :global(.brand-arrow) {
+      transform: translate(3px, -3px);
+    }
+    .brand-logo:hover {
+      opacity: 0.7;
+    }
+    .channels a:hover {
+      color: var(--olive-light);
+    }
+    .channels a:hover :global(.ch-arrow) {
+      transform: translate(3px, -3px);
+      color: var(--olive-light);
     }
     .kei:hover {
       color: var(--white);
     }
   }
+  @media (max-width: 799px) {
+    .sheet,
+    .cta {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      text-align: center;
+    }
+    .stat {
+      justify-self: center;
+    }
+    .credits {
+      width: 100%;
+    }
+    .credit {
+      grid-template-columns: 1fr;
+    }
+    .brands-label {
+      text-align: center;
+    }
+    .foot-main {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 999px) {
+    .brands-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .brand-item:nth-child(3) {
+      border-top: 0;
+    }
+  }
   @media (max-width: 599px) {
+    .brands-grid {
+      column-gap: 1rem;
+    }
+    .brand-item,
+    .brand-next a {
+      gap: 0.6rem;
+    }
+    .brand-next {
+      gap: 0;
+    }
+    .brand-num {
+      width: 1.2rem;
+      font-size: 0.68rem;
+    }
+    .brand-name {
+      font-size: 0.92rem;
+    }
+    .foot {
+      text-align: center;
+    }
+    .brand {
+      justify-items: center;
+    }
+    .channels a {
+      grid-template-columns: 1fr auto;
+      gap: 0.2rem 1rem;
+      text-align: left;
+    }
+    .ch-label {
+      grid-column: 1;
+    }
+    .ch-value {
+      grid-column: 1;
+    }
+    .channels :global(.ch-arrow) {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
     .legal {
       justify-content: center;
     }
@@ -237,6 +496,37 @@ const credits = [
 </style>
 
 <script>
+  // Mail: muchas compus no tienen una app de correo configurada y el mailto no abre nada.
+  // Por eso además se copia la dirección y se avisa en el mismo renglón (el mailto sigue andando si hay app).
+  // Plan B para navegadores que bloquean el portapapeles moderno: copiar desde un campo oculto
+  const copyFallback = (text: string) => {
+    const field = document.createElement('textarea');
+    field.value = text;
+    field.setAttribute('readonly', '');
+    field.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+    document.body.append(field);
+    field.select();
+    const ok = document.execCommand('copy');
+    field.remove();
+    return ok;
+  };
+  const copy = (text: string) =>
+    navigator.clipboard ? navigator.clipboard.writeText(text).then(() => true, () => copyFallback(text)) : Promise.resolve(copyFallback(text));
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-email]').forEach((a) => {
+    const value = a.querySelector<HTMLElement>('.ch-value')!;
+    const email = a.dataset.email!;
+    let timer = 0;
+    a.addEventListener('click', () => {
+      copy(email).then((ok) => {
+        if (!ok) return;
+        value.textContent = '¡Mail copiado!';
+        clearTimeout(timer);
+        timer = window.setTimeout(() => (value.textContent = email), 2200);
+      });
+    });
+  });
+
   // El número sube de 0 al total cuando entra en pantalla (rápido al principio, frena al final)
   const num = document.querySelector<HTMLElement>('[data-count]')!;
   const total = Number(num.dataset.count);

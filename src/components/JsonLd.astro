@@ -1,0 +1,84 @@
+---
+// Datos estructurados (JSON-LD). Todos los datos salen de src/data/site.ts; no se inventan direcciones, precios ni reseñas.
+import { contact, services } from '../data/site';
+
+const site = (Astro.site ?? new URL(Astro.url.origin)).href.replace(/\/$/, '');
+const id = (name: string) => `${site}/#${name}`;
+const phone = '+' + contact.whatsappUrl().match(/wa\.me\/(\d+)/)![1];
+const description =
+  'Estudio creativo de Tomás Fidalgo en Tucumán: creación de contenido, fotografía, video, edición y estrategia para marcas, proyectos y emprendimientos.';
+const address = { '@type': 'PostalAddress', addressRegion: 'Tucumán', addressCountry: 'AR' };
+
+const graph = [
+  {
+    '@type': 'WebSite',
+    '@id': id('website'),
+    url: `${site}/`,
+    name: 'Fidalgo Studio',
+    description,
+    inLanguage: 'es-AR',
+    publisher: { '@id': id('organization') },
+  },
+  {
+    '@type': 'WebPage',
+    '@id': id('webpage'),
+    url: `${site}/`,
+    name: 'Fidalgo Studio | Fotografía, video y contenido en Tucumán',
+    description,
+    inLanguage: 'es-AR',
+    isPartOf: { '@id': id('website') },
+    about: { '@id': id('organization') },
+    primaryImageOfPage: { '@type': 'ImageObject', url: `${site}/og-fidalgo-studio.jpg`, width: 1200, height: 630 },
+  },
+  {
+    '@type': ['ProfessionalService', 'Organization'],
+    '@id': id('organization'),
+    name: 'Fidalgo Studio',
+    url: `${site}/`,
+    description,
+    logo: { '@type': 'ImageObject', url: `${site}/icon-512.png`, width: 512, height: 512 },
+    image: `${site}/og-fidalgo-studio.jpg`,
+    email: contact.email,
+    telephone: phone,
+    address,
+    areaServed: [
+      { '@type': 'AdministrativeArea', name: 'Tucumán' },
+      { '@type': 'Country', name: 'Argentina' },
+    ],
+    founder: { '@id': id('person') },
+    sameAs: [contact.instagramUrl],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      telephone: phone,
+      email: contact.email,
+      availableLanguage: 'es-AR',
+    },
+    knowsAbout: ['Creación de contenido', 'Fotografía', 'Video', 'Edición audiovisual', 'Estrategia de contenido'],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Servicios de Fidalgo Studio',
+      itemListElement: services.map((s) => ({
+        '@type': 'Offer',
+        itemOffered: { '@type': 'Service', name: s.title, description: s.text, provider: { '@id': id('organization') } },
+      })),
+    },
+  },
+  {
+    '@type': 'Person',
+    '@id': id('person'),
+    name: 'Tomás Fidalgo',
+    jobTitle: 'Creador de contenido, fotógrafo, videógrafo y editor',
+    url: `${site}/`,
+    email: contact.email,
+    telephone: phone,
+    worksFor: { '@id': id('organization') },
+    address,
+    sameAs: [contact.instagramUrl],
+  },
+];
+
+const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c');
+---
+
+<script type="application/ld+json" is:inline set:html={json} />
